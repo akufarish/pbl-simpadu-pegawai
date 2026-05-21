@@ -36,9 +36,10 @@ class ApiClient {
         onResponse: (response, handler) {
           return handler.next(response);
         },
-        onError: (DioException e, handler) {
+        onError: (DioException e, handler) async {
           if (e.response?.statusCode == 401) {
             debugPrint('Token expired atau tidak valid');
+            await TokenManager.clearToken();
           }
           return handler.next(e);
         },
