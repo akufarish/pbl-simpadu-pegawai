@@ -7,6 +7,7 @@ import 'package:pegawai/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pegawai/utils/token_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 void main() async {
   await dotenv.load();
@@ -15,7 +16,7 @@ void main() async {
   String? token = await TokenManager.getAccessToken();
   Widget screen = LoginScreen();
 
-  if (token != null) {
+  if (token != null && !JwtDecoder.isExpired(token)) {
     screen = DashboardScreen();
   }
 
