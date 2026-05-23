@@ -8,7 +8,7 @@ class SesiProvider with ChangeNotifier {
   List<Sesi>? _data = [];
   List<Sesi>? get data => _data;
 
-  Future<void> getDataPegawai() async {
+  Future<void> getDataSesi() async {
     isLoading = true;
     notifyListeners();
     try {

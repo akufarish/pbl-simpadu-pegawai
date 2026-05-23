@@ -9,11 +9,12 @@ import 'package:pegawai/screens/main_screen.dart';
 import 'package:pegawai/utils/token_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
-
+  await initializeDateFormatting('id_ID', null);
   String? token = await TokenManager.getAccessToken();
   Widget screen = LoginScreen();
 
@@ -45,6 +46,7 @@ class MainApp extends StatelessWidget {
         "/login": (context) => LoginScreen(),
         "/dashboard": (context) => DashboardScreen(),
         "/kalender": (context) => KalenderScreen(),
+        "/main-screen": (context) => MainScreen(),
       },
     );
   }

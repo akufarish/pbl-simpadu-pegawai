@@ -116,7 +116,7 @@ class _LoginFormState extends State<LoginForm> {
       if (!mounted) return;
 
       if (isSuccess == null) {
-        Navigator.pushReplacementNamed(context, "/dashboard");
+        Navigator.pushReplacementNamed(context, "/main-screen");
       } else {
         setState(() {
           _errorMessage = isSuccess;

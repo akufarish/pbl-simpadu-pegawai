@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pegawai/components/sesi_card.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +18,7 @@ class _KalenderScreenState extends State<KalenderScreen> {
     super.initState();
     Future.microtask(() {
       if (mounted) {
-        context.read<SesiProvider>().getDataPegawai();
+        context.read<SesiProvider>().getDataSesi();
       }
     });
   }
@@ -94,26 +95,9 @@ class _KalenderScreenState extends State<KalenderScreen> {
                           itemCount: selectedEvents.length,
                           itemBuilder: (context, index) {
                             final item = selectedEvents[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              child: ListTile(
-                                leading: const Icon(Icons.book),
-                                title: Text(item.courseName),
-                                subtitle: Text(
-                                  "${item.startTime} - ${item.endTime}",
-                                ),
-                                trailing: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade50,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(item.className),
-                                ),
-                              ),
+                            return Padding(
+                              padding: EdgeInsetsGeometry.all(16),
+                              child: SesiCard(dataSesi: item),
                             );
                           },
                         ),
