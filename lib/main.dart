@@ -5,6 +5,7 @@ import 'package:pegawai/screens/dashboard_screen.dart';
 import 'package:pegawai/screens/kalender_screen.dart';
 import 'package:pegawai/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:pegawai/screens/main_screen.dart';
 import 'package:pegawai/utils/token_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -17,7 +18,7 @@ void main() async {
   Widget screen = LoginScreen();
 
   if (token != null && !JwtDecoder.isExpired(token)) {
-    screen = DashboardScreen();
+    screen = MainScreen();
   }
 
   runApp(
