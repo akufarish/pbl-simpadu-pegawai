@@ -2,17 +2,85 @@ import 'package:flutter/material.dart';
 import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/utils/app_colors.dart';
 
-// SesiCard yang sudah disesuaikan agar cocok dimasukkan ke list
 class SesiCard extends StatelessWidget {
   final Sesi dataSesi;
   const SesiCard({super.key, required this.dataSesi});
 
+  void _bukaSesi(BuildContext context, Sesi dataSesi) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  dataSesi.courseName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Sesi ${dataSesi.sessionNumber}",
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  "Topik Kelas",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, "/detail-sesi");
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: const Text(
+                      "Buka Sesi",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 12.0,
-      ), // Beri jarak antar item
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -42,7 +110,7 @@ class SesiCard extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () => _bukaSesi(context, dataSesi),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
               foregroundColor: Colors.white,
