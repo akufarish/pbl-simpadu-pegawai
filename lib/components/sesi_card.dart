@@ -54,7 +54,11 @@ class SesiCard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      Navigator.pushNamed(context, "/detail-sesi");
+                      Navigator.pushNamed(
+                        context,
+                        "/detail-sesi",
+                        arguments: dataSesi,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
