@@ -23,6 +23,23 @@ class SesiProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> updateSesi(UpdateSesiRequest payload, String id) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      bool isSuccess = await sesiService.updateStatusSesi(payload, id);
+      debugPrint("pls: $isSuccess");
+      isLoading = false;
+      notifyListeners();
+      return isSuccess;
+    } catch (e) {
+      debugPrint(e.toString());
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Map<DateTime, List<Sesi>> getEventsGroupedByDate(List<Sesi> list) {
     Map<DateTime, List<Sesi>> data = {};
     for (var jadwal in list) {

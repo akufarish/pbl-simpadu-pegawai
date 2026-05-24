@@ -32,4 +32,27 @@ class SesiService {
       throw Exception('Network error: $e');
     }
   }
+
+  Future<bool> updateStatusSesi(
+    UpdateSesiRequest payload,
+    String idSesi,
+  ) async {
+    final response = await ApiClient().dio.put(
+      "$kelompok2Url/api/class-sessions/$idSesi",
+      data: payload.toJson(),
+    );
+
+    try {
+      if (response.statusCode == 200) {
+        return true;
+      }
+      return false;
+    } on DioException catch (e) {
+      debugPrint('Samting wong: $e');
+      return false;
+    } catch (e) {
+      debugPrint('Network error: $e');
+      return false;
+    }
+  }
 }

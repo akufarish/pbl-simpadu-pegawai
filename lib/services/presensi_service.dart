@@ -1,49 +1,33 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:pegawai/models/api_response.dart';
 import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/utils/api_client.dart';
 
 class PresensiService {
-  final String kelompok2Url = dotenv.get("KELOMPOK_2_BASE_URL");
+  final String kelompok1Url = dotenv.get("KELOMPOK_1_BASE_URL");
 
   Future<String?> createPresensiMahasiswa(PresensiRequest payload) async {
     try {
       final response = await ApiClient().dio.post(
-        "$kelompok2Url/api/presensi/mahasiswa",
+        "$kelompok1Url/api/presensi/mahasiswa",
         data: payload.toJson(),
       );
 
-      debugPrint("Hit presensi: ${response.data}");
-
       if (response.statusCode == 201) {
         return null;
-      } else {
-        return "samting wong";
       }
+
+      return "Gagal menyimpan data (Status: ${response.statusCode})";
     } on DioException catch (e) {
       if (e.response != null) {
-        try {
-          final errorResult = ApiResponse<dynamic>.fromJson(
-            e.response!.data,
-            (item) => item,
-          );
-
-          debugPrint("Hit presensi: $errorResult");
-          debugPrint("Hit presensi: ${errorResult.message}");
-          debugPrint("Hit presensi: ${errorResult.error}");
-
-          return null;
-        } catch (_) {
-          return "Terjadi kesalahan pada server (${e.response?.statusCode})";
-        }
-      } else {
-        return "Koneksi gagal: ${e.message}";
+        final errorMessage =
+            e.response?.data['message'] ?? "Terjadi kesalahan server";
+        final errorDetail = e.response?.data['error'] ?? "";
+        return "$errorMessage $errorDetail".trim();
       }
+      return "Koneksi gagal: ${e.message}";
     } catch (e) {
-      debugPrint(e.toString());
-      return "Koneksi gagal $e";
+      return "Terjadi kesalahan sistem: $e";
     }
   }
 }

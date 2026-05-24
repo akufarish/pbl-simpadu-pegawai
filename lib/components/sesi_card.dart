@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
+import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -14,22 +15,45 @@ class SesiCard extends StatefulWidget {
 }
 
 class _SesiCardState extends State<SesiCard> {
+  final _topicController = TextEditingController();
+
   void doUpdateSesi(Sesi sesi) async {
+    final topic = _topicController.text;
+
+    final navigator = Navigator.of(context);
+
     PresensiRequest presensiRequest = PresensiRequest(
       pengampuId: "019e5a44-d9ff-744d-b4b0-ad809bd00ada",
       sesiId: sesi.id,
     );
 
     final provider = context.read<PresensiProvider>();
+    final sesiProvider = context.read<SesiProvider>();
 
-    final isSuccess = await provider.createPresensiMahasiswa(presensiRequest);
+    UpdateSesiRequest updateSesiRequest = UpdateSesiRequest(
+      status: "opened",
+      topic: topic,
+    );
 
-    if (!mounted) return;
+    final updateSesi = await sesiProvider.updateSesi(
+      updateSesiRequest,
+      sesi.id,
+    );
 
-    if (isSuccess != null) {
-      Navigator.pushReplacementNamed(context, "/detail-sesi", arguments: sesi);
+    if (updateSesi == true) {
+      final result = await provider.createPresensiMahasiswa(presensiRequest);
+
+      if (result == null) {
+        debugPrint("Navigasi ke detail-sesi...");
+
+        navigator.pop();
+
+        Future.delayed(Duration.zero, () {
+          navigator.pushReplacementNamed("/detail-sesi", arguments: sesi);
+        });
+      }
     } else {
-      debugPrint("gagal");
+      debugPrint("Gagal update sesi");
     }
   }
 
@@ -67,6 +91,7 @@ class _SesiCardState extends State<SesiCard> {
                 ),
                 const SizedBox(height: 8),
                 TextField(
+                  controller: _topicController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -99,6 +124,12 @@ class _SesiCardState extends State<SesiCard> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _topicController.dispose();
+    super.dispose();
   }
 
   @override
@@ -136,19 +167,23 @@ class _SesiCardState extends State<SesiCard> {
               ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () => _bukaSesi(widget.dataSesi),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+          if (widget.dataSesi.isAlreadyOpened != 1)
+            ElevatedButton(
+              onPressed: () => _bukaSesi(widget.dataSesi),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 0,
               ),
-              elevation: 0,
+              child: const Text("Buka Sesi"),
             ),
-            child: const Text("Buka Sesi"),
-          ),
         ],
       ),
     );

@@ -100,3 +100,17 @@ class LecturerModel {
       _$LecturerModelFromJson(json);
   Map<String, dynamic> toJson() => _$LecturerModelToJson(this);
 }
+
+@JsonSerializable()
+class UpdateSesiRequest {
+  @JsonKey(name: 'topic')
+  final String topic;
+  @JsonKey(name: 'status')
+  final String status;
+
+  UpdateSesiRequest({required this.status, required this.topic});
+
+  factory UpdateSesiRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdateSesiRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$UpdateSesiRequestToJson(this);
+}

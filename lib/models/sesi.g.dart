@@ -77,3 +77,12 @@ Map<String, dynamic> _$LecturerModelToJson(LecturerModel instance) =>
       'province_code': instance.provinceCode,
       'citizen_code': instance.citizenCode,
     };
+
+UpdateSesiRequest _$UpdateSesiRequestFromJson(Map<String, dynamic> json) =>
+    UpdateSesiRequest(
+      status: json['status'] as String,
+      topic: json['topic'] as String,
+    );
+
+Map<String, dynamic> _$UpdateSesiRequestToJson(UpdateSesiRequest instance) =>
+    <String, dynamic>{'topic': instance.topic, 'status': instance.status};

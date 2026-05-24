@@ -11,6 +11,7 @@ class PresensiProvider with ChangeNotifier {
       String? isSuccess = await presensiService.createPresensiMahasiswa(
         payload,
       );
+      debugPrint("pls: $isSuccess");
       isLoading = false;
       notifyListeners();
       return isSuccess;
