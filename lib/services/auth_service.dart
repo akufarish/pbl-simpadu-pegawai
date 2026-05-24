@@ -46,7 +46,7 @@ class AuthService {
       return "Koneksi gagal $e";
     }
   }
-  
+
   Future<bool> logout() async {
     try {
       final response = await ApiClient().dio.post(

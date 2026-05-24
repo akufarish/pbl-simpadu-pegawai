@@ -1,12 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/models/sesi.dart';
+import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
+import 'package:provider/provider.dart';
 
-class SesiCard extends StatelessWidget {
+class SesiCard extends StatefulWidget {
   final Sesi dataSesi;
   const SesiCard({super.key, required this.dataSesi});
 
-  void _bukaSesi(BuildContext context, Sesi dataSesi) {
+  @override
+  State<SesiCard> createState() => _SesiCardState();
+}
+
+class _SesiCardState extends State<SesiCard> {
+  void doUpdateSesi(Sesi sesi) async {
+    PresensiRequest presensiRequest = PresensiRequest(
+      pengampuId: "019e5a44-d9ff-744d-b4b0-ad809bd00ada",
+      sesiId: sesi.id,
+    );
+
+    final provider = context.read<PresensiProvider>();
+
+    final isSuccess = await provider.createPresensiMahasiswa(presensiRequest);
+
+    if (!mounted) return;
+
+    if (isSuccess != null) {
+      Navigator.pushReplacementNamed(context, "/detail-sesi", arguments: sesi);
+    } else {
+      debugPrint("gagal");
+    }
+  }
+
+  void _bukaSesi(Sesi dataSesi) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -52,14 +79,7 @@ class SesiCard extends StatelessWidget {
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pushNamed(
-                        context,
-                        "/detail-sesi",
-                        arguments: dataSesi,
-                      );
-                    },
+                    onPressed: () => doUpdateSesi(dataSesi),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,
@@ -94,7 +114,7 @@ class SesiCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  dataSesi.courseName,
+                  widget.dataSesi.courseName,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -104,17 +124,20 @@ class SesiCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 _buildInfoRow(
                   Icons.access_time_filled_rounded,
-                  "${dataSesi.startTime} - ${dataSesi.endTime} WITA",
+                  "${widget.dataSesi.startTime} - ${widget.dataSesi.endTime} WITA",
                 ),
                 const SizedBox(height: 4),
-                _buildInfoRow(Icons.person, dataSesi.lecturer.employeeName),
+                _buildInfoRow(
+                  Icons.person,
+                  widget.dataSesi.lecturer.employeeName,
+                ),
                 const SizedBox(height: 4),
-                _buildInfoRow(Icons.book, dataSesi.className),
+                _buildInfoRow(Icons.book, widget.dataSesi.className),
               ],
             ),
           ),
           ElevatedButton(
-            onPressed: () => _bukaSesi(context, dataSesi),
+            onPressed: () => _bukaSesi(widget.dataSesi),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
               foregroundColor: Colors.white,
