@@ -11,7 +11,7 @@ class PresensiService {
   Future<String?> createPresensiMahasiswa(PresensiRequest payload) async {
     try {
       final response = await ApiClient().dio.post(
-        "https://be.karlearn.site/api/presensi/mahasiswa",
+        "$kelompok2Url/api/presensi/mahasiswa",
         data: payload.toJson(),
       );
 
