@@ -34,77 +34,56 @@ class _NewDashboardState extends State<NewDashboard> {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(left: 32, right: 32),
+        padding: const EdgeInsets.only(left: 12, right: 12),
         child: PageView(
           children: [
             CustomScrollView(
               slivers: [
                 SliverPadding(
-                  padding: EdgeInsetsGeometry.fromLTRB(0, 28, 0, 15),
+                  padding: EdgeInsetsGeometry.only(
+                    top: 28,
+                    left: 12,
+                    right: 12,
+                  ),
                   sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "Selamat Datang, ${user?.name ?? "Joy"}",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Selamat Datang, ${user?.name ?? "Joy"}",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              "Kamu ada ngajar ${sesiProvider.data?.length ?? 0} kelas hari ini",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "Kamu ada ngajar 3 kelas hari ini",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
+                        IconButton(
+                          onPressed: () =>
+                              Navigator.pushNamed(context, "/kalender"),
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Icon(
+                            Icons.calendar_month,
+                            color: Colors.white,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Kelas hari ini",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                          Text(
-                            DateFormat(
-                              'EEEE, d MMM',
-                              'id_ID',
-                            ).format(DateTime.now()),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, "/kalender"),
-                        style: IconButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        icon: const Icon(
-                          Icons.calendar_month,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
                 SliverPadding(
@@ -113,14 +92,74 @@ class _NewDashboardState extends State<NewDashboard> {
                       ? SliverToBoxAdapter(
                           child: Center(child: CircularProgressIndicator()),
                         )
-                      : SliverList(
-                          delegate: SliverChildBuilderDelegate((
-                            context,
-                            index,
-                          ) {
-                            final sesi = sesiProvider.data![index];
-                            return SesiCard(dataSesi: sesi);
-                          }, childCount: sesiProvider.data!.length),
+                      : SliverToBoxAdapter(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 20,
+                                    left: 20,
+                                    right: 20,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Kelas hari ini",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                      Text(
+                                        DateFormat(
+                                          'EEEE, d MMM',
+                                          'id_ID',
+                                        ).format(DateTime.now()),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+
+                                ListView.separated(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: sesiProvider.data!.length,
+                                  itemBuilder: (context, index) {
+                                    final sesi = sesiProvider.data![index];
+
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                      ),
+                                      child: SesiCard(dataSesi: sesi),
+                                    );
+                                  },
+                                  separatorBuilder:
+                                      (BuildContext context, int index) {
+                                        return const Divider(
+                                          height: 32,
+                                          thickness: 1,
+                                        );
+                                      },
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                 ),
               ],
