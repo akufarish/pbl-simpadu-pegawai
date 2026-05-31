@@ -9,6 +9,8 @@ class PresensiMahasiswa extends StatefulWidget {
 }
 
 class _PresensiMahasiswaState extends State<PresensiMahasiswa> {
+  String? _selectedStatus;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -18,43 +20,67 @@ class _PresensiMahasiswaState extends State<PresensiMahasiswa> {
           CircleAvatar(
             radius: 20,
             backgroundColor: AppColors.primaryColor,
-            child: Icon(Icons.person, color: Colors.white),
+            child: const Icon(Icons.person, color: Colors.white),
           ),
-          SizedBox(width: 13),
-          Expanded(
-            child: Text("Joy", style: TextStyle(color: Colors.black)),
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Row(
-              children: [
-                _kehadiranButton("Alpha", "A"),
-                _kehadiranButton("Hadir", "H"),
-                _kehadiranButton("Sakit", "S"),
-                _kehadiranButton("Izin", "I"),
-              ],
+          const SizedBox(width: 13),
+          const Expanded(
+            child: Text(
+              "Joy",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
             ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _kehadiranButton("Alpha", "A"),
+              _kehadiranButton("Hadir", "H"),
+              _kehadiranButton("Sakit", "S"),
+              _kehadiranButton("Izin", "I"),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Padding _kehadiranButton(String data, String label) {
+  Widget _kehadiranButton(String data, String label) {
+    bool isSelected = _selectedStatus == data;
+
     return Padding(
       padding: const EdgeInsets.only(left: 8),
       child: InkWell(
-        onTap: () => {},
+        onTap: () {
+          setState(() {
+            _selectedStatus = data;
+          });
+          debugPrint("Status dipilih: $data");
+        },
         borderRadius: BorderRadius.circular(50),
-        child: Container(
-          width: 40,
-          height: 40,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 35,
+          height: 35,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.primaryColor,
+            color: isSelected
+                ? AppColors.primaryColor
+                : AppColors.secondaryColor,
+            border: Border.all(
+              color: isSelected ? AppColors.primaryColor : Colors.transparent,
+            ),
           ),
           child: Center(
-            child: Text(label, style: TextStyle(color: Colors.white)),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.grey[600],
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
           ),
         ),
       ),

@@ -183,6 +183,29 @@ class _SesiCardState extends State<SesiCard> {
                 elevation: 0,
               ),
               child: const Text("Buka Sesi"),
+            )
+          else
+            ElevatedButton(
+              onPressed: () => {
+                Navigator.pushNamed(
+                  context,
+                  "/detail-sesi",
+                  arguments: widget.dataSesi,
+                ),
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 0,
+              ),
+              child: const Text("Detail Sesi"),
             ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pegawai/screens/dashboard_screen.dart';
 import 'package:pegawai/screens/mata_kuliah_screen.dart';
+import 'package:pegawai/screens/new_dashboard.dart';
 import 'package:pegawai/screens/profile_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
 
@@ -15,7 +16,8 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    DashboardScreen(),
+    // DashboardScreen(),
+    NewDashboard(),
     MataKuliahScreen(),
     ProfileScreen(),
   ];
