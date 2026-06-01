@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:pegawai/models/pegawai.dart';
 import 'package:pegawai/models/user.dart';
 import 'package:pegawai/services/auth_service.dart';
+import 'package:pegawai/services/pegawai_service.dart';
 
 class UserProvider with ChangeNotifier {
   final AuthService authService = AuthService();
+  final PegawaiService pegawaiService = PegawaiService();
   bool isLoading = false;
   UserResponse? _data;
   UserResponse? get data => _data;
+  PegawaiResponse? _dataPegawai;
+  PegawaiResponse? get dataPegawai => _dataPegawai;
 
   Future<String?> login(LoginRequest payload) async {
     isLoading = true;
@@ -45,6 +50,8 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
     try {
       _data = await authService.profile();
+      debugPrint("detail id: ${_data!.detailId}");
+      _dataPegawai = await pegawaiService.showDataPegawai(_data!.detailId!);
       isLoading = false;
       notifyListeners();
     } catch (e) {

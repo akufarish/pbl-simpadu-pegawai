@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:pegawai/models/api_response.dart';
 import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/utils/api_client.dart';
 
@@ -28,6 +30,53 @@ class PresensiService {
       return "Koneksi gagal: ${e.message}";
     } catch (e) {
       return "Terjadi kesalahan sistem: $e";
+    }
+  }
+
+  Future<List<PresensiPegawaiResponse>> getSesi() async {
+    final response = await ApiClient().dio.get(
+      "$kelompok1Url/api/class-sessions",
+    );
+
+    try {
+      if (response.statusCode == 200) {
+        final result = ApiResponse<List<PresensiPegawaiResponse>>.fromJson(
+          response.data,
+          (json) => (json as List)
+              .map(
+                (item) => PresensiPegawaiResponse.fromJson(
+                  item as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+        );
+        debugPrint("Get data presesnsi: ${result.data}");
+        return result.data!;
+      } else {
+        throw Exception('samting wong');
+      }
+    } on DioException catch (e) {
+      throw Exception('Samting wong: $e');
+    } catch (e) {
+      throw Exception('Network error: $e');
+    }
+  }
+
+  Future<bool> createSesi() async {
+    final response = await ApiClient().dio.post(
+      "$kelompok1Url/api/presensi/pegawai",
+    );
+
+    try {
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception('samting wong');
+      }
+    } on DioException catch (e) {
+      throw Exception('Samting wong: $e');
+    } catch (e) {
+      throw Exception('Network error: $e');
     }
   }
 }

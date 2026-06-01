@@ -22,4 +22,21 @@ class PresensiProvider with ChangeNotifier {
       return "Terjadi kesalahan pada sistem";
     }
   }
+
+  Future<bool> createPresensi() async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      bool isSuccess = await presensiService.createSesi();
+      debugPrint("pls: $isSuccess");
+      isLoading = false;
+      notifyListeners();
+      return isSuccess;
+    } catch (e) {
+      debugPrint("$e");
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
 }

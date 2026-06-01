@@ -35,3 +35,34 @@ class PresensiResponse {
       _$PresensiResponseFromJson(json);
   Map<String, dynamic> toJson() => _$PresensiResponseToJson(this);
 }
+
+@JsonSerializable()
+class PresensiPegawai {
+  @JsonKey(name: "detail_id")
+  final String detailId;
+  final String email;
+  final String name;
+
+  PresensiPegawai({
+    required this.detailId,
+    required this.email,
+    required this.name,
+  });
+
+  factory PresensiPegawai.fromJson(Map<String, dynamic> json) =>
+      _$PresensiPegawaiFromJson(json);
+  Map<String, dynamic> toJson() => _$PresensiPegawaiToJson(this);
+}
+
+@JsonSerializable()
+class PresensiPegawaiResponse {
+  final List<PresensiPegawai> pegawai;
+  @JsonKey(name: "sesi_id")
+  final String sesiId;
+
+  PresensiPegawaiResponse({required this.pegawai, required this.sesiId});
+
+  factory PresensiPegawaiResponse.fromJson(Map<String, dynamic> json) =>
+      _$PresensiPegawaiResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$PresensiPegawaiResponseToJson(this);
+}

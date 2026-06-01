@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pegawai/components/sesi_card.dart';
 import 'package:pegawai/models/user.dart';
+import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/providers/user_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
@@ -31,6 +32,21 @@ class _NewDashboardState extends State<NewDashboard> {
     final UserProvider userProvider = context.watch<UserProvider>();
     final UserResponse? user = userProvider.data;
     final SesiProvider sesiProvider = context.watch<SesiProvider>();
+    final PresensiProvider presensiProvider = context.watch<PresensiProvider>();
+
+    void doCreatePresensi() async {
+      bool isSuccess = await presensiProvider.createPresensi();
+
+      if (isSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Presensi berhasil dilakukan")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Presensi gagal dilakukan")),
+        );
+      }
+    }
 
     return Scaffold(
       body: Padding(
@@ -60,7 +76,9 @@ class _NewDashboardState extends State<NewDashboard> {
                               ),
                             ),
                             Text(
-                              "Kamu ada ngajar ${sesiProvider.data?.length ?? 0} kelas hari ini",
+                              sesiProvider.data!.isEmpty
+                                  ? "Tidak ada kelas hari ini"
+                                  : "Kamu ada ngajar ${sesiProvider.data?.length ?? 0} kelas hari ini",
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,
@@ -134,29 +152,41 @@ class _NewDashboardState extends State<NewDashboard> {
                                 ),
                                 const SizedBox(height: 20),
 
-                                ListView.separated(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: sesiProvider.data!.length,
-                                  itemBuilder: (context, index) {
-                                    final sesi = sesiProvider.data![index];
+                                if (sesiProvider.data!.isEmpty != true)
+                                  ListView.separated(
+                                    padding: const EdgeInsets.only(bottom: 20),
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: sesiProvider.data!.length,
+                                    itemBuilder: (context, index) {
+                                      final sesi = sesiProvider.data![index];
 
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                      ),
-                                      child: SesiCard(dataSesi: sesi),
-                                    );
-                                  },
-                                  separatorBuilder:
-                                      (BuildContext context, int index) {
-                                        return const Divider(
-                                          height: 32,
-                                          thickness: 1,
-                                        );
-                                      },
-                                ),
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                        ),
+                                        child: SesiCard(dataSesi: sesi),
+                                      );
+                                    },
+                                    separatorBuilder:
+                                        (BuildContext context, int index) {
+                                          return const Divider(
+                                            height: 32,
+                                            thickness: 1,
+                                          );
+                                        },
+                                  )
+                                else
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 12,
+                                      bottom: 50,
+                                    ),
+                                    child: Center(
+                                      child: Text("Tidak ada kelas hari ini"),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
@@ -206,7 +236,9 @@ class _NewDashboardState extends State<NewDashboard> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              onPressed: () {},
+                              onPressed: presensiProvider.isLoading
+                                  ? null
+                                  : doCreatePresensi,
                               child: const Text(
                                 "Presensi",
                                 style: TextStyle(color: Colors.white),

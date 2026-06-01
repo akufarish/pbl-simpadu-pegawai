@@ -33,3 +33,30 @@ Map<String, dynamic> _$PresensiResponseToJson(PresensiResponse instance) =>
       'pengampu_id': instance.pengampuId,
       'mahasiswa': instance.mahasiswa.map((e) => e.toJson()).toList(),
     };
+
+PresensiPegawai _$PresensiPegawaiFromJson(Map<String, dynamic> json) =>
+    PresensiPegawai(
+      detailId: json['detail_id'] as String,
+      email: json['email'] as String,
+      name: json['name'] as String,
+    );
+
+Map<String, dynamic> _$PresensiPegawaiToJson(PresensiPegawai instance) =>
+    <String, dynamic>{
+      'detail_id': instance.detailId,
+      'email': instance.email,
+      'name': instance.name,
+    };
+
+PresensiPegawaiResponse _$PresensiPegawaiResponseFromJson(
+  Map<String, dynamic> json,
+) => PresensiPegawaiResponse(
+  pegawai: (json['pegawai'] as List<dynamic>)
+      .map((e) => PresensiPegawai.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  sesiId: json['sesi_id'] as String,
+);
+
+Map<String, dynamic> _$PresensiPegawaiResponseToJson(
+  PresensiPegawaiResponse instance,
+) => <String, dynamic>{'pegawai': instance.pegawai, 'sesi_id': instance.sesiId};
