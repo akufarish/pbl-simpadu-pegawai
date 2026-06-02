@@ -60,3 +60,19 @@ PresensiPegawaiResponse _$PresensiPegawaiResponseFromJson(
 Map<String, dynamic> _$PresensiPegawaiResponseToJson(
   PresensiPegawaiResponse instance,
 ) => <String, dynamic>{'pegawai': instance.pegawai, 'sesi_id': instance.sesiId};
+
+UpdatePresensiMahasiswa _$UpdatePresensiMahasiswaFromJson(
+  Map<String, dynamic> json,
+) => UpdatePresensiMahasiswa(
+  sesiId: json['sesi_id'] as String,
+  detailId: json['detail_id'] as String,
+  status: json['status'] as String,
+);
+
+Map<String, dynamic> _$UpdatePresensiMahasiswaToJson(
+  UpdatePresensiMahasiswa instance,
+) => <String, dynamic>{
+  'sesi_id': instance.sesiId,
+  'detail_id': instance.detailId,
+  'status': instance.status,
+};

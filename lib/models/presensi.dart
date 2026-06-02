@@ -66,3 +66,22 @@ class PresensiPegawaiResponse {
       _$PresensiPegawaiResponseFromJson(json);
   Map<String, dynamic> toJson() => _$PresensiPegawaiResponseToJson(this);
 }
+
+@JsonSerializable()
+class UpdatePresensiMahasiswa {
+  @JsonKey(name: "sesi_id")
+  String sesiId;
+  @JsonKey(name: "detail_id")
+  String detailId;
+  String status;
+
+  UpdatePresensiMahasiswa({
+    required this.sesiId,
+    required this.detailId,
+    required this.status,
+  });
+
+  factory UpdatePresensiMahasiswa.fromJson(Map<String, dynamic> json) =>
+      _$UpdatePresensiMahasiswaFromJson(json);
+  Map<String, dynamic> toJson() => _$UpdatePresensiMahasiswaToJson(this);
+}

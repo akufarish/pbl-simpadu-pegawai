@@ -12,10 +12,13 @@ class MahasiswaResponse {
   @JsonKey(name: "email")
   final String email;
 
+  final String status;
+
   MahasiswaResponse({
     required this.detailId,
     required this.email,
     required this.name,
+    required this.status,
   });
 
   factory MahasiswaResponse.fromJson(Map<String, dynamic> json) =>

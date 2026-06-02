@@ -11,6 +11,7 @@ MahasiswaResponse _$MahasiswaResponseFromJson(Map<String, dynamic> json) =>
       detailId: json['detail_id'] as String,
       email: json['email'] as String,
       name: json['name'] as String,
+      status: json['status'] as String,
     );
 
 Map<String, dynamic> _$MahasiswaResponseToJson(MahasiswaResponse instance) =>
@@ -18,4 +19,5 @@ Map<String, dynamic> _$MahasiswaResponseToJson(MahasiswaResponse instance) =>
       'detail_id': instance.detailId,
       'name': instance.name,
       'email': instance.email,
+      'status': instance.status,
     };

@@ -26,14 +26,12 @@ class _MataKuliahScreenState extends State<MataKuliahScreen> {
   Widget build(BuildContext context) {
     final PengampuProvider pengampuProvider = context.watch<PengampuProvider>();
 
-    // 1. Ambil data list pengampu
     final listPengampu = pengampuProvider.data;
 
     return Scaffold(
       appBar: AppBar(title: const Text("Mata Kuliah")),
       body: pengampuProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
-          // 2. Cegah error jika data ternyata null atau kosong
           : (listPengampu == null || listPengampu.isEmpty)
           ? const Center(child: Text("Data mata kuliah tidak ditemukan"))
           : CustomScrollView(

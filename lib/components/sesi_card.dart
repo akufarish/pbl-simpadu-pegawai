@@ -3,6 +3,7 @@ import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
+import 'package:pegawai/screens/detail_sesi_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -49,7 +50,11 @@ class _SesiCardState extends State<SesiCard> {
         navigator.pop();
 
         Future.delayed(Duration.zero, () {
-          navigator.pushReplacementNamed("/detail-sesi", arguments: sesi);
+          navigator.push(
+            MaterialPageRoute(
+              builder: (context) => DetailSesiScreen(sesi: sesi),
+            ),
+          );
         });
       }
     } else {
@@ -187,10 +192,12 @@ class _SesiCardState extends State<SesiCard> {
           else
             ElevatedButton(
               onPressed: () => {
-                Navigator.pushNamed(
+                Navigator.push(
                   context,
-                  "/detail-sesi",
-                  arguments: widget.dataSesi,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DetailSesiScreen(sesi: widget.dataSesi),
+                  ),
                 ),
               },
               style: ElevatedButton.styleFrom(

@@ -54,7 +54,6 @@ class MainApp extends StatelessWidget {
         "/dashboard": (context) => DashboardScreen(),
         "/kalender": (context) => KalenderScreen(),
         "/main-screen": (context) => MainScreen(),
-        "/detail-sesi": (context) => DetailSesiScreen(),
       },
     );
   }

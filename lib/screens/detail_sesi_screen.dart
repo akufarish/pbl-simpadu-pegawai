@@ -2,10 +2,13 @@ import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:pegawai/components/presensi_mahasiswa.dart';
 import 'package:pegawai/models/sesi.dart';
+import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class DetailSesiScreen extends StatefulWidget {
-  const DetailSesiScreen({super.key});
+  final Sesi sesi;
+  const DetailSesiScreen({super.key, required this.sesi});
 
   @override
   State<DetailSesiScreen> createState() => _DetailSesiScreenState();
@@ -23,6 +26,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
   late TabController _tabController;
   late PageController _pageController;
   String? selectedStatus;
+  
 
   @override
   void initState() {
@@ -30,6 +34,14 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
     _tabController = TabController(length: 3, vsync: this);
     _pageController = PageController();
     selectedStatus = "Status";
+
+    Future.microtask(() {
+      if (mounted) {
+        context.read<PresensiProvider>().getDataPresensiMahasiswa(
+          widget.sesi.id,
+        );
+      }
+    });
   }
 
   @override
@@ -41,8 +53,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
 
   @override
   Widget build(BuildContext context) {
-    final sesi = ModalRoute.of(context)!.settings.arguments as Sesi;
-    debugPrint("Id Sesi: ${sesi.id}");
+    debugPrint("Id Sesi: ${widget.sesi.id}");
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -61,7 +72,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    sesi.courseName,
+                    widget.sesi.courseName,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -71,12 +82,15 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                   const SizedBox(height: 8),
                   _buildInfoRow(
                     Icons.access_time_filled_rounded,
-                    "${sesi.startTime} - ${sesi.endTime} WITA",
+                    "${widget.sesi.startTime} - ${widget.sesi.endTime} WITA",
                   ),
                   const SizedBox(height: 4),
-                  _buildInfoRow(Icons.person, sesi.lecturer.employeeName),
+                  _buildInfoRow(
+                    Icons.person,
+                    widget.sesi.lecturer.employeeName,
+                  ),
                   const SizedBox(height: 4),
-                  _buildInfoRow(Icons.book, "Sesi ${sesi.id}"),
+                  _buildInfoRow(Icons.book, "Sesi ${widget.sesi.id}"),
                 ],
               ),
             ),
@@ -128,6 +142,8 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
   }
 
   Padding _daftarMahasiswa() {
+    PresensiProvider presensiProvider = context.watch<PresensiProvider>();
+    final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
     return Padding(
       padding: const EdgeInsets.only(top: 15, left: 28, right: 28),
       child: Column(
@@ -171,7 +187,29 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
               ),
             ),
           ),
-          for (var i = 0; i < 20; i++) PresensiMahasiswa(),
+          // for (var i = 0; i < 20; i++) PresensiMahasiswa(),
+          presensiProvider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : (dataPresensiMahasiswa == null)
+              ? const Center(child: Text("Presensi"))
+              : ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: dataPresensiMahasiswa.mahasiswa.length,
+                  itemBuilder: (context, index) {
+                    final sesi =
+                        presensiProvider.presensiMahasiswa!.mahasiswa[index];
+                    debugPrint(sesi.name);
+
+                    return PresensiMahasiswa(
+                      name: sesi.name,
+                      detailId: sesi.detailId,
+                      sesiId: presensiProvider.presensiMahasiswa!.sesiId,
+                      initialStatus: sesi.status,
+                    );
+                  },
+                ),
         ],
       ),
     );
