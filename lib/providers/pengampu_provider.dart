@@ -9,7 +9,7 @@ class PengampuProvider with ChangeNotifier {
   List<Pengampu>? get data => _data;
 
   Future<void> getPengampu() async {
-    isLoading = false;
+    isLoading = true;
     notifyListeners();
     try {
       _data = await pengampuService.getPengampu();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pegawai/providers/pengampu_provider.dart';
+import 'package:pegawai/screens/detail_matkul_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +29,6 @@ class _MataKuliahScreenState extends State<MataKuliahScreen> {
       appBar: AppBar(title: Text("Mata Kuliah")),
       body: pengampuProvider.isLoading
           ? Center(child: CircularProgressIndicator())
-          // : Text("test"),
           : CustomScrollView(
               slivers: [
                 SliverPadding(
@@ -39,7 +39,7 @@ class _MataKuliahScreenState extends State<MataKuliahScreen> {
                   ),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      final matkul = pengampuProvider.data?[index];
+                      final matkul = pengampuProvider.data![index];
                       return Padding(
                         padding: EdgeInsets.only(bottom: 16),
                         child: Card(
@@ -52,7 +52,7 @@ class _MataKuliahScreenState extends State<MataKuliahScreen> {
                                   children: [
                                     Icon(Icons.class_),
                                     SizedBox(width: 12),
-                                    Text(matkul?.mataKuliah.name ?? "Kosong"),
+                                    Text(matkul.mataKuliah.name),
                                   ],
                                 ),
                                 SizedBox(height: 8),
@@ -60,10 +60,20 @@ class _MataKuliahScreenState extends State<MataKuliahScreen> {
                                   children: [
                                     Icon(Icons.person),
                                     SizedBox(width: 12),
-                                    Text(matkul?.dosen.name ?? "Kosong"),
+                                    Text(matkul.dosen.name),
                                     Spacer(),
                                     ElevatedButton(
-                                      onPressed: () => {},
+                                      onPressed: () => {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DetailMatkulScreen(
+                                                  pengampu: matkul,
+                                                ),
+                                          ),
+                                        ),
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.primaryColor,
                                         foregroundColor: Colors.white,

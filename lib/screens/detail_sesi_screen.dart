@@ -70,7 +70,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                   const SizedBox(height: 4),
                   _buildInfoRow(Icons.person, sesi.lecturer.employeeName),
                   const SizedBox(height: 4),
-                  _buildInfoRow(Icons.book, "Sesi ${sesi.sessionNumber}"),
+                  _buildInfoRow(Icons.book, "Sesi ${sesi.id}"),
                 ],
               ),
             ),
