@@ -10,6 +10,7 @@ import 'package:pegawai/screens/kalender_screen.dart';
 import 'package:pegawai/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pegawai/screens/main_screen.dart';
+import 'package:pegawai/screens/upload_tugas_screen.dart';
 import 'package:pegawai/utils/token_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -54,6 +55,7 @@ class MainApp extends StatelessWidget {
         "/dashboard": (context) => DashboardScreen(),
         "/kalender": (context) => KalenderScreen(),
         "/main-screen": (context) => MainScreen(),
+        "/upload-tugas": (context) => UploadTugas(),
       },
     );
   }

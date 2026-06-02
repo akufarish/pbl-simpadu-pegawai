@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:pegawai/models/tugas.dart';
 import 'package:pegawai/providers/tugas_provider.dart';
+import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 
 class UploadTugas extends StatefulWidget {
@@ -40,6 +41,48 @@ class _UploadTugasState extends State<UploadTugas> {
     }
   }
 
+  void _showConfirmDialog(Tugas tugas) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: const Text(
+                      "Upload file",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     TugasProvider tugasProvider = context.watch<TugasProvider>();
@@ -64,6 +107,7 @@ class _UploadTugasState extends State<UploadTugas> {
                     height: 100,
                     child: Card(
                       child: InkWell(
+                        onTap: () => _showConfirmDialog(tugas),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -86,7 +130,8 @@ class _UploadTugasState extends State<UploadTugas> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: uploadFile,
-        child: Icon(Icons.add),
+        backgroundColor: AppColors.primaryColor,
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }
