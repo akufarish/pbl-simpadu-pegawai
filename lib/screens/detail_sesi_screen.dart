@@ -196,14 +196,3 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
     );
   }
 }
-
-Widget _buildTabContent(List<Widget> children) {
-  return SingleChildScrollView(
-    // Mencegah Overflow saat konten panjang
-    padding: const EdgeInsets.all(15.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: children,
-    ),
-  );
-}

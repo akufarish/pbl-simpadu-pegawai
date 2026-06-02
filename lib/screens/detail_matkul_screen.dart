@@ -18,7 +18,6 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
   @override
   void initState() {
     super.initState();
-    // Menggunakan TabController biasa (PageController tidak diperlukan lagi)
     _tabController = TabController(length: 3, vsync: this);
   }
 
@@ -38,11 +37,9 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
           },
         ),
       ),
-      // PERUBAHAN UTAMA: Menggunakan NestedScrollView
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
-            // Bagian info Mata Kuliah
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               sliver: SliverToBoxAdapter(
@@ -72,7 +69,6 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
                 ),
               ),
             ),
-            // Bagian TabBar (Akan 'pinned' atau tetap menggantung di atas saat di-scroll)
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -92,22 +88,18 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
             ),
           ];
         },
-        // Body menerima TabBarView bawaan Flutter yang otomatis mendukung ListView di dalamnya
         body: Padding(
           padding: const EdgeInsets.only(top: 12),
           child: TabBarView(
             controller: _tabController,
             children: [
-              // Tab 1: Contoh ListView yang aman dari error unbounded height
               ListView.builder(
                 padding: const EdgeInsets.all(12),
                 itemCount: 15,
                 itemBuilder: (context, index) =>
                     Card(child: ListTile(title: Text("Sesi Ke-${index + 1}"))),
               ),
-              // Tab 2: TugasScreen Anda (Sekarang aman jika di dalamnya ada ListView)
               const TugasScreen(),
-              // Tab 3: Materi
               const Center(child: Text("Konten Materi")),
             ],
           ),

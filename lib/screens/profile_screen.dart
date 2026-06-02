@@ -87,10 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: [
                                   // informasi umum
                                   _buildTabContent([
-                                    CardInfo(
-                                      dataPegawai!.employeeName,
-                                      "Nama:",
-                                    ),
+                                    CardInfo(dataPegawai.employeeName, "Nama:"),
                                     const SizedBox(height: 12),
                                     const Divider(),
                                     const SizedBox(height: 12),

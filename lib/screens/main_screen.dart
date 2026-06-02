@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pegawai/screens/dashboard_screen.dart';
 import 'package:pegawai/screens/mata_kuliah_screen.dart';
 import 'package:pegawai/screens/new_dashboard.dart';
 import 'package:pegawai/screens/profile_screen.dart';
