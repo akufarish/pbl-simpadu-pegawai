@@ -75,6 +75,8 @@ class AuthService {
       response.data,
       (item) => UserResponse.fromJson(item as Map<String, dynamic>),
     );
+
+    await TokenManager.setDetailId(result.data!.detailId!);
     return result.data!;
   }
 }

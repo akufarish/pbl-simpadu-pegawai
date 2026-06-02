@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:pegawai/models/api_response.dart';
 import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/utils/api_client.dart';
@@ -33,22 +34,18 @@ class PresensiService {
     }
   }
 
-  Future<List<PresensiPegawaiResponse>> getSesi() async {
+  Future<PresensiPegawaiResponse> getPresensi() async {
+    String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final response = await ApiClient().dio.get(
-      "$kelompok1Url/api/class-sessions",
+      "$kelompok1Url/api/presensi/pegawai?date=$formattedDate",
     );
 
     try {
       if (response.statusCode == 200) {
-        final result = ApiResponse<List<PresensiPegawaiResponse>>.fromJson(
+        final result = ApiResponse<PresensiPegawaiResponse>.fromJson(
           response.data,
-          (json) => (json as List)
-              .map(
-                (item) => PresensiPegawaiResponse.fromJson(
-                  item as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+          (json) =>
+              PresensiPegawaiResponse.fromJson(json as Map<String, dynamic>),
         );
         debugPrint("Get data presesnsi: ${result.data}");
         return result.data!;

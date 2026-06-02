@@ -5,6 +5,8 @@ import 'package:pegawai/services/presensi_service.dart';
 class PresensiProvider with ChangeNotifier {
   final PresensiService presensiService = PresensiService();
   bool isLoading = false;
+  PresensiPegawaiResponse? _data;
+  PresensiPegawaiResponse? get data => _data;
 
   Future<String?> createPresensiMahasiswa(PresensiRequest payload) async {
     try {
@@ -37,6 +39,21 @@ class PresensiProvider with ChangeNotifier {
       isLoading = false;
       notifyListeners();
       return false;
+    }
+  }
+
+  Future<void> getDataPresensiPegawai() async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      _data = await presensiService.getPresensi();
+      debugPrint("hasil presensi: $_data");
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      debugPrint(e.toString());
+      isLoading = false;
+      notifyListeners();
     }
   }
 }

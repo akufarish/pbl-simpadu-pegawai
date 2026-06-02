@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pegawai/providers/pengampu_provider.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/providers/user_provider.dart';
@@ -30,6 +31,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => SesiProvider()),
         ChangeNotifierProvider(create: (_) => PresensiProvider()),
+        ChangeNotifierProvider(create: (_) => PengampuProvider()),
       ],
       child: MainApp(screen: screen),
     ),

@@ -23,6 +23,7 @@ class _NewDashboardState extends State<NewDashboard> {
       if (mounted) {
         context.read<UserProvider>().profile();
         context.read<SesiProvider>().getDataSesi();
+        context.read<PresensiProvider>().getDataPresensiPegawai();
       }
     });
   }
@@ -227,6 +228,7 @@ class _NewDashboardState extends State<NewDashboard> {
                               color: Colors.greenAccent,
                             ),
                             const SizedBox(height: 12),
+                            Text(presensiProvider.data?.sesiId ?? "Kosong"),
                             const Text("Kamu Sudah Presensi Hari Ini"),
                             const SizedBox(height: 20),
                             ElevatedButton(
