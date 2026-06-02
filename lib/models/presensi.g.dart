@@ -65,14 +65,28 @@ UpdatePresensiMahasiswa _$UpdatePresensiMahasiswaFromJson(
   Map<String, dynamic> json,
 ) => UpdatePresensiMahasiswa(
   sesiId: json['sesi_id'] as String,
-  detailId: json['detail_id'] as String,
-  status: json['status'] as String,
+  detail: (json['detail'] as List<dynamic>)
+      .map(
+        (e) =>
+            DetailUpdatePresensiMahassiwa.fromJson(e as Map<String, dynamic>),
+      )
+      .toList(),
 );
 
 Map<String, dynamic> _$UpdatePresensiMahasiswaToJson(
   UpdatePresensiMahasiswa instance,
+) => <String, dynamic>{'sesi_id': instance.sesiId, 'detail': instance.detail};
+
+DetailUpdatePresensiMahassiwa _$DetailUpdatePresensiMahassiwaFromJson(
+  Map<String, dynamic> json,
+) => DetailUpdatePresensiMahassiwa(
+  detailId: json['detail_id'] as String,
+  status: json['status'] as String,
+);
+
+Map<String, dynamic> _$DetailUpdatePresensiMahassiwaToJson(
+  DetailUpdatePresensiMahassiwa instance,
 ) => <String, dynamic>{
-  'sesi_id': instance.sesiId,
   'detail_id': instance.detailId,
   'status': instance.status,
 };

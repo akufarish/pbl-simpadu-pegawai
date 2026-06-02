@@ -39,73 +39,66 @@ class _MataKuliahScreenState extends State<MataKuliahScreen> {
                 SliverPadding(
                   padding: const EdgeInsets.only(top: 20, left: 23, right: 23),
                   sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        // 3. Data sudah dijamin aman (tidak null)
-                        final matkul = listPengampu[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.class_),
-                                      const SizedBox(width: 12),
-                                      // Sudah sesuai dengan model terbaru
-                                      Text(matkul.mataKuliah.name),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.person),
-                                      const SizedBox(width: 12),
-                                      Text(matkul.dosen.name),
-                                      const Spacer(),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailMatkulScreen(
-                                                    pengampu: matkul,
-                                                  ),
-                                            ),
-                                          );
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              AppColors.primaryColor,
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                            vertical: 8,
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final matkul = listPengampu[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.class_),
+                                    const SizedBox(width: 12),
+                                    Text(matkul.mataKuliah.name),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.person),
+                                    const SizedBox(width: 12),
+                                    Text(matkul.dosen.name),
+                                    const Spacer(),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DetailMatkulScreen(
+                                                  pengampu: matkul,
+                                                ),
                                           ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                          elevation: 0,
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primaryColor,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
                                         ),
-                                        child: const Text("Detail Matkul"),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        elevation: 0,
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                      child: const Text("Detail Matkul"),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                      // 4. Menggunakan length dari list yang sudah divalidasi
-                      childCount: listPengampu.length,
-                    ),
+                        ),
+                      );
+                    }, childCount: listPengampu.length),
                   ),
                 ),
               ],

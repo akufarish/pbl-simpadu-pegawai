@@ -100,17 +100,10 @@ class PresensiService {
   }
 
   Future<void> updatePresensi(UpdatePresensiMahasiswa payload) async {
-    final Map<String, dynamic> data = {
-      "sesi_id": payload.sesiId,
-      "detail": [
-        {"detail_id": payload.detailId, "status": payload.status.toLowerCase()},
-      ],
-    };
-
     try {
       final response = await ApiClient().dio.put(
         "$kelompok1Url/api/presensi/mahasiswa",
-        data: data,
+        data: payload,
       );
 
       debugPrint("Sukses simpan presensi: ${response.statusCode}");
@@ -125,4 +118,31 @@ class PresensiService {
       throw Exception("Network Error: $e");
     }
   }
+
+  // Future<void> updatePresensi(UpdatePresensiMahasiswa payload) async {
+  //   final Map<String, dynamic> data = {
+  //     "sesi_id": payload.sesiId,
+  //     "detail": [
+  //       {"detail_id": payload.detailId, "status": payload.status.toLowerCase()},
+  //     ],
+  //   };
+
+  //   try {
+  //     final response = await ApiClient().dio.put(
+  //       "$kelompok1Url/api/presensi/mahasiswa",
+  //       data: data,
+  //     );
+
+  //     debugPrint("Sukses simpan presensi: ${response.statusCode}");
+  //   } on DioException catch (e) {
+  //     debugPrint(
+  //       "Gagal simpan presensi (${e.response?.statusCode}): ${e.response?.data}",
+  //     );
+  //     throw Exception(
+  //       "Gagal menyimpan presensi: ${e.response?.data ?? e.message}",
+  //     );
+  //   } catch (e) {
+  //     throw Exception("Network Error: $e");
+  //   }
+  // }
 }

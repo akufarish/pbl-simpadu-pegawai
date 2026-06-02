@@ -1,7 +1,9 @@
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:pegawai/components/presensi_mahasiswa.dart';
 import 'package:pegawai/models/sesi.dart';
+import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +28,9 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
   late TabController _tabController;
   late PageController _pageController;
   String? selectedStatus;
-  
+
+  final Map<String, String> _tempPresensiMap = {};
+  bool _isMapInitialized = false;
 
   @override
   void initState() {
@@ -66,7 +70,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsetsGeometry.fromLTRB(26, 14, 26, 0),
+              padding: const EdgeInsets.fromLTRB(26, 14, 26, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -95,7 +99,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
               ),
             ),
           ),
-          SliverToBoxAdapter(child: SizedBox(height: 20)),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
           SliverToBoxAdapter(
             child: DefaultTabController(
               length: 3,
@@ -110,11 +114,11 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                     onTap: (index) {
                       _pageController.animateToPage(
                         index,
-                        duration: Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                       );
                     },
-                    tabs: [
+                    tabs: const [
                       Tab(text: "Presensi"),
                       Tab(text: "Tugas"),
                       Tab(text: "Materi"),
@@ -125,14 +129,18 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
             ),
           ),
           SliverPadding(
-            padding: EdgeInsetsGeometry.only(top: 20),
+            padding: const EdgeInsets.only(top: 20),
             sliver: SliverToBoxAdapter(
               child: ExpandablePageView(
                 controller: _pageController,
                 onPageChanged: (index) {
                   _tabController.animateTo(index);
                 },
-                children: [_daftarMahasiswa(), Text("2"), Text("3")],
+                children: [
+                  _daftarMahasiswa(),
+                  const Text("2"),
+                  const Text("3"),
+                ],
               ),
             ),
           ),
@@ -144,6 +152,14 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
   Padding _daftarMahasiswa() {
     PresensiProvider presensiProvider = context.watch<PresensiProvider>();
     final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
+
+    if (dataPresensiMahasiswa != null && !_isMapInitialized) {
+      for (var mhs in dataPresensiMahasiswa.mahasiswa) {
+        _tempPresensiMap[mhs.detailId] = mhs.status ?? "";
+      }
+      _isMapInitialized = true;
+    }
+
     return Padding(
       padding: const EdgeInsets.only(top: 15, left: 28, right: 28),
       child: Column(
@@ -187,28 +203,93 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
               ),
             ),
           ),
-          // for (var i = 0; i < 20; i++) PresensiMahasiswa(),
           presensiProvider.isLoading
               ? const Center(child: CircularProgressIndicator())
               : (dataPresensiMahasiswa == null)
-              ? const Center(child: Text("Presensi"))
-              : ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: dataPresensiMahasiswa.mahasiswa.length,
-                  itemBuilder: (context, index) {
-                    final sesi =
-                        presensiProvider.presensiMahasiswa!.mahasiswa[index];
-                    debugPrint(sesi.name);
+              ? const Center(child: Text("Presensi tidak ditemukan"))
+              : Column(
+                  children: [
+                    ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: dataPresensiMahasiswa.mahasiswa.length,
+                      itemBuilder: (context, index) {
+                        final sesi = dataPresensiMahasiswa.mahasiswa[index];
 
-                    return PresensiMahasiswa(
-                      name: sesi.name,
-                      detailId: sesi.detailId,
-                      sesiId: presensiProvider.presensiMahasiswa!.sesiId,
-                      initialStatus: sesi.status,
-                    );
-                  },
+                        return PresensiMahasiswa(
+                          name: sesi.name,
+                          detailId: sesi.detailId,
+                          sesiId: dataPresensiMahasiswa.sesiId,
+
+                          currentStatus: _tempPresensiMap[sesi.detailId] ?? "",
+                          onStatusChanged: (newStatus) {
+                            setState(() {
+                              _tempPresensiMap[sesi.detailId] = newStatus;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          List<DetailUpdatePresensiMahassiwa> listDetail = [];
+                          _tempPresensiMap.forEach((id, status) {
+                            if (status.isNotEmpty) {
+                              listDetail.add(
+                                DetailUpdatePresensiMahassiwa(
+                                  detailId: id,
+                                  status: status.toLowerCase(),
+                                ),
+                              );
+                            }
+                          });
+
+                          final payload = UpdatePresensiMahasiswa(
+                            sesiId: dataPresensiMahasiswa.sesiId,
+                            detail: listDetail,
+                          );
+
+                          bool sukses = await context
+                              .read<PresensiProvider>()
+                              .updatePresensiMahasiswa(payload);
+
+                          if (!mounted) return;
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                sukses
+                                    ? "Semua data presensi berhasil diperbarui!"
+                                    : "Gagal menyimpan presensi",
+                              ),
+                              backgroundColor: sukses
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          "Simpan",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                  ],
                 ),
         ],
       ),

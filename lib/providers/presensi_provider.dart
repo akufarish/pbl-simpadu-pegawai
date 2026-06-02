@@ -93,4 +93,20 @@ class PresensiProvider with ChangeNotifier {
       return false;
     }
   }
+
+  // Future<bool> updatePresensiMahasiswa(UpdatePresensiMahasiswa payload) async {
+  //   isLoading = true;
+  //   notifyListeners();
+  //   try {
+  //     await presensiService.updatePresensi(payload);
+  //     isLoading = false;
+  //     notifyListeners();
+  //     return true;
+  //   } catch (e) {
+  //     debugPrint("$e");
+  //     isLoading = false;
+  //     notifyListeners();
+  //     return false;
+  //   }
+  // }
 }
