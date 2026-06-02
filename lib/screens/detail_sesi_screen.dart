@@ -13,7 +13,13 @@ class DetailSesiScreen extends StatefulWidget {
 
 class _DetailSesiScreenState extends State<DetailSesiScreen>
     with SingleTickerProviderStateMixin {
-  final List<String> daftarHadirList = ["Hadir", "Sakit", "Alpha", "Izin"];
+  final List<String> daftarHadirList = [
+    "Hadir",
+    "Sakit",
+    "Alpha",
+    "Izin",
+    "Status",
+  ];
   late TabController _tabController;
   late PageController _pageController;
   String? selectedStatus;
@@ -23,7 +29,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _pageController = PageController();
-    selectedStatus = "Hadir";
+    selectedStatus = "Status";
   }
 
   @override

@@ -1,4 +1,3 @@
-import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:pegawai/models/pengampu.dart';
 import 'package:pegawai/screens/tugas_screen.dart';
@@ -15,19 +14,17 @@ class DetailMatkulScreen extends StatefulWidget {
 class _DetailMatkulScreenState extends State<DetailMatkulScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
+    // Menggunakan TabController biasa (PageController tidak diperlukan lagi)
     _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _pageController.dispose();
     super.dispose();
   }
 
@@ -41,12 +38,13 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: CustomScrollView(
-          slivers: [
+      // PERUBAHAN UTAMA: Menggunakan NestedScrollView
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            // Bagian info Mata Kuliah
             SliverPadding(
-              padding: EdgeInsetsGeometry.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,7 +52,7 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.class_, color: Colors.black, size: 18),
+                        const Icon(Icons.class_, color: Colors.black, size: 18),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -68,54 +66,51 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 4),
                     _buildInfoRow(Icons.person, widget.pengampu.dosen.name),
                   ],
                 ),
               ),
             ),
+            // Bagian TabBar (Akan 'pinned' atau tetap menggantung di atas saat di-scroll)
             SliverToBoxAdapter(
-              child: DefaultTabController(
-                length: 3,
-                child: Column(
-                  children: [
-                    TabBar(
-                      controller: _tabController,
-                      tabAlignment: TabAlignment.start,
-                      isScrollable: true,
-                      labelColor: AppColors.primaryColor,
-                      unselectedLabelColor: Colors.grey,
-                      onTap: (index) {
-                        _pageController.animateToPage(
-                          index,
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      tabs: [
-                        Tab(text: "Sesi"),
-                        Tab(text: "Tugas"),
-                        Tab(text: "Materi"),
-                      ],
-                    ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: TabBar(
+                  controller: _tabController,
+                  tabAlignment: TabAlignment.start,
+                  isScrollable: true,
+                  labelColor: AppColors.primaryColor,
+                  unselectedLabelColor: Colors.grey,
+                  tabs: const [
+                    Tab(text: "Sesi"),
+                    Tab(text: "Tugas"),
+                    Tab(text: "Materi"),
                   ],
                 ),
               ),
             ),
-            SliverPadding(
-              padding: EdgeInsetsGeometry.only(top: 20),
-              sliver: SliverToBoxAdapter(
-                child: ExpandablePageView(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    _tabController.animateTo(index);
-                  },
-                  children: [Text("1"), TugasScreen(), Text("3")],
-                ),
+          ];
+        },
+        // Body menerima TabBarView bawaan Flutter yang otomatis mendukung ListView di dalamnya
+        body: Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              // Tab 1: Contoh ListView yang aman dari error unbounded height
+              ListView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: 15,
+                itemBuilder: (context, index) =>
+                    Card(child: ListTile(title: Text("Sesi Ke-${index + 1}"))),
               ),
-            ),
-          ],
+              // Tab 2: TugasScreen Anda (Sekarang aman jika di dalamnya ada ListView)
+              const TugasScreen(),
+              // Tab 3: Materi
+              const Center(child: Text("Konten Materi")),
+            ],
+          ),
         ),
       ),
     );
