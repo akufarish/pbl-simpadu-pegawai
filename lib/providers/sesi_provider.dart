@@ -8,9 +8,13 @@ class SesiProvider with ChangeNotifier {
   List<Sesi>? _data = [];
   List<Sesi>? get data => _data;
 
+  List<Sesi>? _dataKalender;
+  List<Sesi>? get dataKalender => _dataKalender;
+
   Future<void> getDataSesi(String? startDate, String? endDate) async {
     isLoading = true;
     notifyListeners();
+    _data = null;
     try {
       _data = await sesiService.getSesi(startDate, endDate);
       debugPrint("hasil pegawai: $_data");
@@ -18,6 +22,24 @@ class SesiProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint(e.toString());
+      _data = null;
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getDataSesiKalender(String? startDate, String? endDate) async {
+    isLoading = true;
+    notifyListeners();
+    _dataKalender = null;
+    try {
+      _dataKalender = await sesiService.getSesi(startDate, endDate);
+      debugPrint("hasil pegawai: $_data");
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      debugPrint(e.toString());
+      _dataKalender = null;
       isLoading = false;
       notifyListeners();
     }

@@ -31,7 +31,7 @@ class _KalenderScreenState extends State<KalenderScreen> {
 
     final endDate = DateTime(date.year, date.month + 1, 0);
 
-    context.read<SesiProvider>().getDataSesi(
+    context.read<SesiProvider>().getDataSesiKalender(
       _formatDate(startDate),
       _formatDate(endDate),
     );
@@ -48,8 +48,8 @@ class _KalenderScreenState extends State<KalenderScreen> {
   Widget build(BuildContext context) {
     final SesiProvider sesiProvider = context.watch<SesiProvider>();
 
-    final allEvents = sesiProvider.data != null
-        ? sesiProvider.getEventsGroupedByDate(sesiProvider.data!)
+    final allEvents = sesiProvider.dataKalender != null
+        ? sesiProvider.getEventsGroupedByDate(sesiProvider.dataKalender!)
         : {};
 
     final selectedEvents =
