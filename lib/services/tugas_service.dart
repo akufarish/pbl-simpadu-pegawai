@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:pegawai/models/api_response.dart';
 import 'package:pegawai/models/tugas.dart';
 import 'package:pegawai/utils/api_client.dart';
@@ -116,4 +117,52 @@ class TugasService {
   //     return false;
   //   }
   // }
+
+  Future<bool> buatTugas(
+    String sesiId,
+    List<String> materiId,
+    String title,
+    String description,
+    DateTime deadline,
+  ) async {
+    final Map<String, dynamic> payload = {
+      "file_uuids": materiId,
+      "title": title,
+      "description": description,
+      "deadline": DateFormat('yyyy-MM-dd').format(deadline),
+    };
+    try {
+      final response = await ApiClient().dio.post(
+        "$kelompok2Url/api/class-sessions/$sesiId/assignments",
+        data: payload,
+      );
+
+      debugPrint("Response sukses: $response");
+      return true;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        debugPrint(
+          "Validasi Gagal (Status ${e.response?.statusCode}): ${e.response?.data}",
+        );
+
+        try {
+          final errorResult = ApiResponse<dynamic>.fromJson(
+            e.response!.data,
+            (item) => item,
+          );
+          debugPrint(errorResult.error ?? errorResult.message);
+          return false;
+        } catch (_) {
+          debugPrint("Terjadi kesalahan pada parsing error server");
+          return false;
+        }
+      } else {
+        debugPrint("Koneksi gagal atau request dibatalkan: ${e.message}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Gagal total saat proses upload: $e");
+      return false;
+    }
+  }
 }

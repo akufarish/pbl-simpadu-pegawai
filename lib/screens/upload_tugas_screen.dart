@@ -23,6 +23,9 @@ class _UploadTugasState extends State<UploadTugas> {
   bool isMultiSelectEnabled = false;
   String? selectedPoli;
   String? selectedSesi;
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  DateTime? selectedDate;
 
   @override
   void initState() {
@@ -33,6 +36,21 @@ class _UploadTugasState extends State<UploadTugas> {
         context.read<PengampuProvider>().getPengampu();
       }
     });
+  }
+
+  Future<void> pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2024),
+      lastDate: DateTime(2027),
+      initialDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
   }
 
   void doMultiSelection(String path) {
@@ -134,9 +152,7 @@ class _UploadTugasState extends State<UploadTugas> {
 
                         return DropdownButtonFormField<String>(
                           value: selectedSesi,
-                          disabledHint: const Text(
-                            "Pilih mata kuliah terlebih dahulu",
-                          ),
+                          disabledHint: const Text("Pilih mata kuliah"),
                           decoration: const InputDecoration(
                             labelText: "Pilih Sesi",
                             border: OutlineInputBorder(),
@@ -197,6 +213,238 @@ class _UploadTugasState extends State<UploadTugas> {
                                       content: Text(
                                         "Materi berhasil diupload!",
                                       ),
+                                    ),
+                                  );
+                                  setState(() {
+                                    selectedItem.clear();
+                                    isMultiSelectEnabled = false;
+                                  });
+                                } else {
+                                  scaffoldMessenger.showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Gagal mengupload materi"),
+                                    ),
+                                  );
+                                }
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: const Text(
+                          "Upload file",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showConfirmDialogTugas() {
+    final pengampuList = context.read<PengampuProvider>().data;
+
+    if (pengampuList == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Data pengampu belum siap atau kosong")),
+      );
+      return;
+    }
+
+    selectedSesi = null;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return Dialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                key: const Key('dialog_padding'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextFormField(
+                      controller: _titleController,
+                      decoration: InputDecoration(
+                        labelText: 'Title',
+                        labelStyle: TextStyle(color: Colors.black),
+                        prefixIcon: Icon(Icons.mail, color: Colors.black),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Harap masukkan Title";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    TextFormField(
+                      controller: _descriptionController,
+                      decoration: InputDecoration(
+                        labelText: 'Deskripsi',
+                        labelStyle: TextStyle(color: Colors.black),
+                        prefixIcon: Icon(Icons.mail, color: Colors.black),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Harap masukkan Deskripsi";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            selectedDate == null
+                                ? "Pilih tanggal"
+                                : selectedDate.toString().split(" ")[0],
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: pickDate,
+                          child: Text("Pilih tanggal"),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    DropdownButtonFormField<String>(
+                      value: selectedPoli,
+                      decoration: const InputDecoration(
+                        labelText: "Pilih Mata Kuliah",
+                        border: OutlineInputBorder(),
+                      ),
+                      items: pengampuList.map((item) {
+                        return DropdownMenuItem<String>(
+                          value: item.pengampuId.toString(),
+                          child: Text(item.mataKuliah.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          selectedPoli = value;
+                          selectedSesi = null;
+                        });
+
+                        if (value != null) {
+                          context.read<SesiProvider>().getDataSesiByPengampu(
+                            value,
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    Consumer<SesiProvider>(
+                      builder: (context, sesiProvider, child) {
+                        final sesiList = sesiProvider.data;
+
+                        if (sesiProvider.isLoading) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+
+                        return DropdownButtonFormField<String>(
+                          value: selectedSesi,
+                          disabledHint: const Text("Pilih mata kuliah"),
+                          decoration: const InputDecoration(
+                            labelText: "Pilih Sesi",
+                            border: OutlineInputBorder(),
+                          ),
+                          items: selectedPoli == null || sesiList == null
+                              ? null
+                              : sesiList.map((sesi) {
+                                  return DropdownMenuItem<String>(
+                                    value: sesi.id.toString(),
+                                    child: Text("Sesi ${sesi.sessionNumber}"),
+                                  );
+                                }).toList(),
+                          onChanged: selectedPoli == null
+                              ? null
+                              : (value) {
+                                  setStateDialog(() {
+                                    selectedSesi = value;
+                                  });
+                                },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: selectedPoli != null && selectedSesi != null
+                            ? () async {
+                                List<String> materiIds = selectedItem
+                                    .cast<String>()
+                                    .toList();
+
+                                if (materiIds.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Silahkan pilih materi terlebih dahulu",
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                Navigator.pop(context);
+
+                                final scaffoldMessenger = ScaffoldMessenger.of(
+                                  context,
+                                );
+                                bool isSuccess = await context
+                                    .read<TugasProvider>()
+                                    .uploadTugasKeSesi(
+                                      selectedSesi!,
+                                      materiIds,
+                                      _titleController.text,
+                                      _descriptionController.text,
+                                      selectedDate!,
+                                    );
+
+                                if (isSuccess) {
+                                  scaffoldMessenger.showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Tugas berhasil diupload!"),
                                     ),
                                   );
                                   setState(() {
@@ -309,7 +557,7 @@ class _UploadTugasState extends State<UploadTugas> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton.extended(
-            onPressed: () {},
+            onPressed: _showConfirmDialogTugas,
             backgroundColor: AppColors.primaryColor,
             label: Text("Upload Tugas", style: TextStyle(color: Colors.white)),
           ),

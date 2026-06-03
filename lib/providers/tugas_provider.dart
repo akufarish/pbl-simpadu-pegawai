@@ -42,4 +42,32 @@ class TugasProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> uploadTugasKeSesi(
+    String sesiId,
+    List<String> materiId,
+    String title,
+    String description,
+    DateTime deadline,
+  ) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      await tugasService.buatTugas(
+        sesiId,
+        materiId,
+        title,
+        description,
+        deadline,
+      );
+      isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint(e.toString());
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
 }
