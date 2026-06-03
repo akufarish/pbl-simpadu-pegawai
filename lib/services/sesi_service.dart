@@ -55,4 +55,29 @@ class SesiService {
       return false;
     }
   }
+
+  Future<List<Sesi>> getSesibyPengampu(String id) async {
+    final response = await ApiClient().dio.get(
+      "$kelompok2Url/api/class-sessions/pengampu/$id",
+    );
+
+    try {
+      if (response.statusCode == 200) {
+        final result = ApiResponse<List<Sesi>>.fromJson(
+          response.data,
+          (json) => (json as List)
+              .map((item) => Sesi.fromJson(item as Map<String, dynamic>))
+              .toList(),
+        );
+        debugPrint("Get data sesi: ${result.data}");
+        return result.data!;
+      } else {
+        throw Exception('samting wong');
+      }
+    } on DioException catch (e) {
+      throw Exception('Samting wong: $e');
+    } catch (e) {
+      throw Exception('Network error: $e');
+    }
+  }
 }

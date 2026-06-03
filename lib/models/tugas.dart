@@ -24,3 +24,6 @@ class Tugas {
   factory Tugas.fromJson(Map<String, dynamic> json) => _$TugasFromJson(json);
   Map<String, dynamic> toJson() => _$TugasToJson(this);
 }
+
+@JsonSerializable()
+class TugasRequest {}

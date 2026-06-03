@@ -23,6 +23,21 @@ class SesiProvider with ChangeNotifier {
     }
   }
 
+  Future<void> getDataSesiByPengampu(String id) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      _data = await sesiService.getSesibyPengampu(id);
+      debugPrint("hasil pegawai: $_data");
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      debugPrint(e.toString());
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> updateSesi(UpdateSesiRequest payload, String id) async {
     isLoading = true;
     notifyListeners();

@@ -80,4 +80,40 @@ class TugasService {
       throw Exception('Network error: $e');
     }
   }
+
+  // Future<bool> buatTugas() async {
+  //   try {
+  //     final response = await ApiClient().dio.post(
+  //       "$kelompok2Url/api/file-uploads",
+  //       data: payload,
+  //     );
+
+  //     debugPrint("Response sukses: $response");
+  //     return true;
+  //   } on DioException catch (e) {
+  //     if (e.response != null) {
+  //       debugPrint(
+  //         "Validasi Gagal (Status ${e.response?.statusCode}): ${e.response?.data}",
+  //       );
+
+  //       try {
+  //         final errorResult = ApiResponse<dynamic>.fromJson(
+  //           e.response!.data,
+  //           (item) => item,
+  //         );
+  //         debugPrint(errorResult.error ?? errorResult.message);
+  //         return false;
+  //       } catch (_) {
+  //         debugPrint("Terjadi kesalahan pada parsing error server");
+  //         return false;
+  //       }
+  //     } else {
+  //       debugPrint("Koneksi gagal atau request dibatalkan: ${e.message}");
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Gagal total saat proses upload: $e");
+  //     return false;
+  //   }
+  // }
 }
