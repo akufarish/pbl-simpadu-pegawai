@@ -5,12 +5,13 @@ import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/providers/tugas_provider.dart';
 import 'package:pegawai/providers/user_provider.dart';
-import 'package:pegawai/screens/dashboard_screen.dart';
-import 'package:pegawai/screens/detail_sesi_screen.dart';
+// import 'package:pegawai/screens/dashboard_screen.dart';
+// import 'package:pegawai/screens/detail_sesi_screen.dart';
 import 'package:pegawai/screens/kalender_screen.dart';
 import 'package:pegawai/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pegawai/screens/main_screen.dart';
+import 'package:pegawai/screens/new_dashboard.dart';
 import 'package:pegawai/screens/upload_tugas_screen.dart';
 import 'package:pegawai/utils/token_manager.dart';
 import 'package:provider/provider.dart';
@@ -54,7 +55,7 @@ class MainApp extends StatelessWidget {
       home: Scaffold(body: screen),
       routes: {
         "/login": (context) => LoginScreen(),
-        "/dashboard": (context) => DashboardScreen(),
+        "/dashboard": (context) => NewDashboard(),
         "/kalender": (context) => KalenderScreen(),
         "/main-screen": (context) => MainScreen(),
         "/upload-tugas": (context) => UploadTugas(),

@@ -158,9 +158,13 @@ class _SesiCardState extends State<SesiCard> {
                   ),
                 ),
                 const SizedBox(height: 8),
+                // _buildInfoRow(
+                //   Icons.access_time_filled_rounded,
+                //   "${widget.dataSesi.startTime} - ${widget.dataSesi.endTime} WITA",
+                // ),
                 _buildInfoRow(
                   Icons.access_time_filled_rounded,
-                  "${widget.dataSesi.startTime} - ${widget.dataSesi.endTime} WITA",
+                  widget.dataSesi.sessionDate,
                 ),
                 const SizedBox(height: 4),
                 _buildInfoRow(

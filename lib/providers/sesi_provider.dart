@@ -8,11 +8,11 @@ class SesiProvider with ChangeNotifier {
   List<Sesi>? _data = [];
   List<Sesi>? get data => _data;
 
-  Future<void> getDataSesi() async {
+  Future<void> getDataSesi(String? startDate, String? endDate) async {
     isLoading = true;
     notifyListeners();
     try {
-      _data = await sesiService.getSesi();
+      _data = await sesiService.getSesi(startDate, endDate);
       debugPrint("hasil pegawai: $_data");
       isLoading = false;
       notifyListeners();

@@ -16,16 +16,36 @@ class NewDashboard extends StatefulWidget {
 }
 
 class _NewDashboardState extends State<NewDashboard> {
+  DateTime _focusedDay = DateTime.now();
+
+  String _formatDate(DateTime date) {
+    String year = date.year.toString();
+    String month = date.month.toString().padLeft(2, '0');
+    String day = date.day.toString().padLeft(2, '0');
+    return "$year-$month-$day";
+  }
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
       if (mounted) {
         context.read<UserProvider>().profile();
-        context.read<SesiProvider>().getDataSesi();
         context.read<PresensiProvider>().getDataPresensiPegawai();
+        _getDataSesi(_focusedDay);
       }
     });
+  }
+
+  void _getDataSesi(DateTime date) {
+    final startDate = DateTime(date.year, date.month, 1);
+
+    final endDate = DateTime(date.year, date.month + 1, 0);
+
+    context.read<SesiProvider>().getDataSesi(
+      _formatDate(startDate),
+      _formatDate(endDate),
+    );
   }
 
   @override

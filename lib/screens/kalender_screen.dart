@@ -13,24 +13,44 @@ class KalenderScreen extends StatefulWidget {
 }
 
 class _KalenderScreenState extends State<KalenderScreen> {
+  DateTime _selectedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
       if (mounted) {
-        context.read<SesiProvider>().getDataSesi();
+        _getDataSesi(_focusedDay);
       }
     });
   }
 
-  DateTime _selectedDay = DateTime(1990, 1, 8);
-  DateTime _focusedDay = DateTime(1990, 1, 8);
+  void _getDataSesi(DateTime date) {
+    final startDate = DateTime(date.year, date.month, 1);
+
+    final endDate = DateTime(date.year, date.month + 1, 0);
+
+    context.read<SesiProvider>().getDataSesi(
+      _formatDate(startDate),
+      _formatDate(endDate),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    String year = date.year.toString();
+    String month = date.month.toString().padLeft(2, '0');
+    String day = date.day.toString().padLeft(2, '0');
+    return "$year-$month-$day";
+  }
 
   @override
   Widget build(BuildContext context) {
     final SesiProvider sesiProvider = context.watch<SesiProvider>();
 
-    final allEvents = sesiProvider.getEventsGroupedByDate(sesiProvider.data!);
+    final allEvents = sesiProvider.data != null
+        ? sesiProvider.getEventsGroupedByDate(sesiProvider.data!)
+        : {};
 
     final selectedEvents =
         allEvents[DateTime(
@@ -66,6 +86,11 @@ class _KalenderScreenState extends State<KalenderScreen> {
                       _selectedDay = selectedDay;
                       _focusedDay = focusedDay;
                     });
+                  },
+
+                  onPageChanged: (focusedDay) {
+                    _focusedDay = focusedDay;
+                    _getDataSesi(focusedDay);
                   },
 
                   calendarStyle: CalendarStyle(

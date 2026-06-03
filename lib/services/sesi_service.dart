@@ -8,9 +8,10 @@ import 'package:pegawai/utils/api_client.dart';
 class SesiService {
   final String kelompok2Url = dotenv.get("KELOMPOK_2_BASE_URL");
 
-  Future<List<Sesi>> getSesi() async {
+  Future<List<Sesi>> getSesi(String? startDate, String? endDate) async {
     final response = await ApiClient().dio.get(
       "$kelompok2Url/api/class-sessions",
+      queryParameters: {'start_date': startDate, 'end_date': endDate},
     );
 
     try {
