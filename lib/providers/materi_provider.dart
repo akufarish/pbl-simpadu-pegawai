@@ -20,4 +20,20 @@ class MateriProvider with ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> downloadMateri(String id, String fileName) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      bool isSuccess = await materiService.downloadMateri(id, fileName);
+      isLoading = false;
+      notifyListeners();
+      return isSuccess;
+    } catch (e) {
+      debugPrint(e.toString());
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
 }

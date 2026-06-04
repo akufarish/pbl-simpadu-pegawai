@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pegawai/models/api_response.dart';
 import 'package:pegawai/models/materi.dart';
 import 'package:pegawai/models/tugas.dart';
@@ -57,6 +58,50 @@ class MateriService {
             (item) => item,
           );
           debugPrint(errorResult.error ?? errorResult.message);
+          return false;
+        } catch (_) {
+          debugPrint("Terjadi kesalahan pada parsing error server");
+          return false;
+        }
+      } else {
+        debugPrint("Koneksi gagal atau request dibatalkan: ${e.message}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("Gagal total saat proses upload: $e");
+      return false;
+    }
+  }
+
+  Future<bool> downloadMateri(String id, String fileName) async {
+    try {
+      final path = "/storage/emulated/0/Download/Sabar/$fileName";
+      final response = await ApiClient().dio.download(
+        "$kelompok2Url/api/file-uploads/$id/download",
+        path,
+      );
+
+      if (response.statusCode == 200) {
+        debugPrint("download: $response");
+        debugPrint("path download: $path");
+        return true;
+      } else {
+        return false;
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        debugPrint(
+          "Validasi Gagal (Status ${e.response?.statusCode}): ${e.response?.data}",
+        );
+
+        try {
+          final errorResult = ApiResponse<dynamic>.fromJson(
+            e.response!.data,
+            (item) => item,
+          );
+          debugPrint(
+            "Error download: ${errorResult.error ?? errorResult.message}",
+          );
           return false;
         } catch (_) {
           debugPrint("Terjadi kesalahan pada parsing error server");

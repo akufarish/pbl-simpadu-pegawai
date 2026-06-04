@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:pegawai/components/presensi_mahasiswa.dart';
 import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/models/presensi.dart';
+import 'package:pegawai/providers/materi_provider.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/screens/tugas_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
@@ -54,6 +55,25 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
     _tabController.dispose();
     _pageController.dispose();
     super.dispose();
+  }
+
+  void downloadMateri(String id, String fileName) async {
+    bool result = await context.read<MateriProvider>().downloadMateri(
+      id,
+      fileName,
+    );
+
+    if (mounted) {
+      if (result) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Download file berhasil")));
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Download file gagal")));
+      }
+    }
   }
 
   @override
@@ -174,7 +194,8 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                         Text(materi.originaFileName),
                         Spacer(),
                         ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: () =>
+                              downloadMateri(materi.id, materi.originaFileName),
                           style: IconButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
                             minimumSize: Size(50, 50),
