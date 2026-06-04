@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pegawai/components/sesi_card.dart';
 import 'package:pegawai/models/pengampu.dart';
-import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/screens/tugas_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';

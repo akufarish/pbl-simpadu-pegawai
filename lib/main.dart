@@ -5,8 +5,6 @@ import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/providers/tugas_provider.dart';
 import 'package:pegawai/providers/user_provider.dart';
-// import 'package:pegawai/screens/dashboard_screen.dart';
-// import 'package:pegawai/screens/detail_sesi_screen.dart';
 import 'package:pegawai/screens/kalender_screen.dart';
 import 'package:pegawai/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

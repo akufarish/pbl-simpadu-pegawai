@@ -1,12 +1,9 @@
-import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:pegawai/components/presensi_mahasiswa.dart';
 import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/providers/materi_provider.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
-import 'package:pegawai/screens/tugas_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -223,7 +220,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
 
     if (dataPresensiMahasiswa != null && !_isMapInitialized) {
       for (var mhs in dataPresensiMahasiswa.mahasiswa) {
-        _tempPresensiMap[mhs.detailId] = mhs.status ?? "";
+        _tempPresensiMap[mhs.detailId] = mhs.status;
       }
       _isMapInitialized = true;
     }
