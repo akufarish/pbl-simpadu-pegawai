@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:pegawai/components/sesi_card.dart';
 import 'package:pegawai/models/pengampu.dart';
+import 'package:pegawai/models/sesi.dart';
+import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/screens/tugas_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class DetailMatkulScreen extends StatefulWidget {
   final Pengampu pengampu;
@@ -19,6 +23,11 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    if (mounted) {
+      context.read<SesiProvider>().getDataSesiByPengampu(
+        widget.pengampu.pengampuId,
+      );
+    }
   }
 
   @override
@@ -29,6 +38,9 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
 
   @override
   Widget build(BuildContext context) {
+    SesiProvider sesiProvider = context.watch<SesiProvider>();
+    List<Sesi>? dataSesi = sesiProvider.data;
+
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -93,12 +105,26 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
           child: TabBarView(
             controller: _tabController,
             children: [
-              ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: 15,
-                itemBuilder: (context, index) =>
-                    Card(child: ListTile(title: Text("Sesi Ke-${index + 1}"))),
-              ),
+              sesiProvider.isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  :
+                    // if (dataSesi != null)
+                    ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: sesiProvider.data!.length,
+                      itemBuilder: (context, index) {
+                        final sesi = sesiProvider.data![index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: SesiCard(dataSesi: sesi),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const Divider(height: 32, thickness: 1);
+                      },
+                    ),
               const TugasScreen(),
               const Center(child: Text("Konten Materi")),
             ],
