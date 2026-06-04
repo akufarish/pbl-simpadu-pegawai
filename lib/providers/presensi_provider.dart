@@ -32,10 +32,15 @@ class PresensiProvider with ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
-      bool isSuccess = await presensiService.createSesi();
+      bool isSuccess = await presensiService.createPresensi();
       debugPrint("pls: $isSuccess");
       isLoading = false;
       notifyListeners();
+
+      if (isSuccess) {
+        await getDataPresensiPegawai();
+      }
+
       return isSuccess;
     } catch (e) {
       debugPrint("$e");

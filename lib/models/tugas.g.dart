@@ -21,3 +21,9 @@ Map<String, dynamic> _$TugasToJson(Tugas instance) => <String, dynamic>{
   'mime_type': instance.mimeType,
   'uploaded_at': instance.uploadedAt,
 };
+
+TugasRequest _$TugasRequestFromJson(Map<String, dynamic> json) =>
+    TugasRequest();
+
+Map<String, dynamic> _$TugasRequestToJson(TugasRequest instance) =>
+    <String, dynamic>{};

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pegawai/components/sesi_card.dart';
+import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/models/user.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
@@ -54,6 +55,7 @@ class _NewDashboardState extends State<NewDashboard> {
     final UserResponse? user = userProvider.data;
     final SesiProvider sesiProvider = context.watch<SesiProvider>();
     final PresensiProvider presensiProvider = context.watch<PresensiProvider>();
+    final PresensiPegawaiResponse? dataPresensi = presensiProvider.data;
 
     void doCreatePresensi() async {
       bool isSuccess = await presensiProvider.createPresensi();
@@ -97,10 +99,11 @@ class _NewDashboardState extends State<NewDashboard> {
                               ),
                             ),
                             Text(
-                              sesiProvider.data!.isEmpty
+                              (sesiProvider.data == null ||
+                                      sesiProvider.data!.isEmpty)
                                   ? "Tidak ada kelas hari ini"
-                                  : "Kamu ada ngajar ${sesiProvider.data?.length ?? 0} kelas hari ini",
-                              style: TextStyle(
+                                  : "Kamu ada ngajar ${sesiProvider.data!.length} kelas hari ini",
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -128,7 +131,7 @@ class _NewDashboardState extends State<NewDashboard> {
                 SliverPadding(
                   padding: EdgeInsetsGeometry.only(top: 15),
                   sliver: sesiProvider.isLoading
-                      ? SliverToBoxAdapter(
+                      ? const SliverToBoxAdapter(
                           child: Center(child: CircularProgressIndicator()),
                         )
                       : SliverToBoxAdapter(
@@ -173,7 +176,8 @@ class _NewDashboardState extends State<NewDashboard> {
                                 ),
                                 const SizedBox(height: 20),
 
-                                if (sesiProvider.data!.isEmpty != true)
+                                if (sesiProvider.data != null &&
+                                    sesiProvider.data!.isNotEmpty)
                                   ListView.separated(
                                     padding: const EdgeInsets.only(bottom: 20),
                                     shrinkWrap: true,
@@ -182,7 +186,6 @@ class _NewDashboardState extends State<NewDashboard> {
                                     itemCount: sesiProvider.data!.length,
                                     itemBuilder: (context, index) {
                                       final sesi = sesiProvider.data![index];
-
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 20,
@@ -199,8 +202,8 @@ class _NewDashboardState extends State<NewDashboard> {
                                         },
                                   )
                                 else
-                                  Padding(
-                                    padding: const EdgeInsets.only(
+                                  const Padding(
+                                    padding: EdgeInsets.only(
                                       top: 12,
                                       bottom: 50,
                                     ),
@@ -239,36 +242,65 @@ class _NewDashboardState extends State<NewDashboard> {
                         ),
                       ),
                       const Spacer(),
-                      Center(
-                        child: Column(
-                          children: [
-                            const Icon(
-                              Icons.verified,
-                              size: 64,
-                              color: Colors.greenAccent,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(presensiProvider.data?.sesiId ?? "Kosong"),
-                            const Text("Kamu Sudah Presensi Hari Ini"),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                      if (dataPresensi != null)
+                        Center(
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.verified,
+                                size: 64,
+                                color: Colors.greenAccent,
+                              ),
+                              const SizedBox(height: 12),
+                              const Text("Kamu Sudah Presensi Hari Ini"),
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: null,
+                                child: const Text(
+                                  "Presensi",
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
-                              onPressed: presensiProvider.isLoading
-                                  ? null
-                                  : doCreatePresensi,
-                              child: const Text(
-                                "Presensi",
-                                style: TextStyle(color: Colors.white),
+                            ],
+                          ),
+                        )
+                      else
+                        Center(
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.close,
+                                size: 64,
+                                color: Colors.redAccent,
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 12),
+                              const Text("Kamu Belum Presensi Hari Ini"),
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: presensiProvider.isLoading
+                                    ? null
+                                    : doCreatePresensi,
+                                child: const Text(
+                                  "Presensi",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
+
                       const Spacer(),
                     ],
                   ),

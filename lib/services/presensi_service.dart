@@ -36,11 +36,12 @@ class PresensiService {
 
   Future<PresensiPegawaiResponse> getPresensi() async {
     String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final response = await ApiClient().dio.get(
-      "$kelompok1Url/api/presensi/pegawai?date=$formattedDate",
-    );
-
     try {
+      final response = await ApiClient().dio.get(
+        "$kelompok1Url/api/presensi/pegawai?date=$formattedDate",
+      );
+
+      debugPrint("Get data presesnsi: $response");
       if (response.statusCode == 200) {
         final result = ApiResponse<PresensiPegawaiResponse>.fromJson(
           response.data,
@@ -49,23 +50,46 @@ class PresensiService {
         );
         debugPrint("Get data presesnsi: ${result.data}");
         return result.data!;
+      } else if (response.statusCode == 400) {
+        debugPrint("Belum presensi hari ini");
+        throw Exception('Belum presensi hari ini');
       } else {
         throw Exception('samting wong');
       }
     } on DioException catch (e) {
-      throw Exception('Samting wong: $e');
+      if (e.response != null) {
+        debugPrint(
+          "Presensi gagal (Status ${e.response?.statusCode}): ${e.response?.data}",
+        );
+
+        try {
+          final errorResult = ApiResponse<dynamic>.fromJson(
+            e.response!.data,
+            (item) => item,
+          );
+          debugPrint(
+            "Presensi gagal: ${errorResult.error ?? errorResult.message}",
+          );
+          throw Exception('Presensi gagal');
+        } catch (_) {
+          debugPrint("Presensi gagal");
+          throw Exception('Presensi gagal');
+        }
+      } else {
+        debugPrint("Presensi gagal: ${e.message}");
+        throw Exception('Presensi gagal');
+      }
     } catch (e) {
       throw Exception('Network error: $e');
     }
   }
 
-  Future<bool> createSesi() async {
-    final response = await ApiClient().dio.post(
-      "$kelompok1Url/api/presensi/pegawai",
-    );
-
+  Future<bool> createPresensi() async {
     try {
-      if (response.statusCode == 200) {
+      final response = await ApiClient().dio.post(
+        "$kelompok1Url/api/presensi/pegawai",
+      );
+      if (response.statusCode == 201) {
         return true;
       } else {
         throw Exception('samting wong');

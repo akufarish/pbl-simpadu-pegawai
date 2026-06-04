@@ -22,6 +22,9 @@ Sesi _$SesiFromJson(Map<String, dynamic> json) => Sesi(
   isAlreadyOpened: (json['is_already_opened'] as num).toInt(),
   lecturerId: json['lecturer_id'] as String,
   lecturer: LecturerModel.fromJson(json['lecturer'] as Map<String, dynamic>),
+  learningMaterials: (json['learning_materials'] as List<dynamic>?)
+      ?.map((e) => Tugas.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$SesiToJson(Sesi instance) => <String, dynamic>{
@@ -40,6 +43,7 @@ Map<String, dynamic> _$SesiToJson(Sesi instance) => <String, dynamic>{
   'is_already_opened': instance.isAlreadyOpened,
   'lecturer_id': instance.lecturerId,
   'lecturer': instance.lecturer,
+  'learning_materials': instance.learningMaterials,
 };
 
 LecturerModel _$LecturerModelFromJson(Map<String, dynamic> json) =>
