@@ -5,6 +5,7 @@ import 'package:pegawai/components/presensi_mahasiswa.dart';
 import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
+import 'package:pegawai/screens/tugas_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -66,90 +67,106 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
           },
         ),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(26, 14, 26, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.sesi.courseName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.black,
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.sesi.courseName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildInfoRow(
-                    Icons.access_time_filled_rounded,
-                    "${widget.sesi.startTime} - ${widget.sesi.endTime} WITA",
-                  ),
-                  const SizedBox(height: 4),
-                  _buildInfoRow(
-                    Icons.person,
-                    widget.sesi.lecturer.employeeName,
-                  ),
-                  const SizedBox(height: 4),
-                  _buildInfoRow(Icons.book, "Sesi ${widget.sesi.id}"),
-                ],
+                    const SizedBox(height: 8),
+                    _buildInfoRow(
+                      Icons.access_time_filled_rounded,
+                      "${widget.sesi.startTime} - ${widget.sesi.endTime} WITA",
+                    ),
+                    const SizedBox(height: 4),
+                    _buildInfoRow(
+                      Icons.person,
+                      widget.sesi.lecturer.employeeName,
+                    ),
+                    const SizedBox(height: 4),
+                    _buildInfoRow(Icons.book, "Sesi ${widget.sesi.id}"),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: 20)),
-          SliverToBoxAdapter(
-            child: DefaultTabController(
-              length: 3,
-              child: Column(
-                children: [
-                  TabBar(
-                    controller: _tabController,
-                    tabAlignment: TabAlignment.start,
-                    isScrollable: true,
-                    labelColor: AppColors.primaryColor,
-                    unselectedLabelColor: Colors.grey,
-                    onTap: (index) {
-                      _pageController.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    tabs: const [
-                      Tab(text: "Presensi"),
-                      Tab(text: "Tugas"),
-                      Tab(text: "Materi"),
-                    ],
-                  ),
-                ],
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: TabBar(
+                  controller: _tabController,
+                  tabAlignment: TabAlignment.start,
+                  isScrollable: true,
+                  labelColor: AppColors.primaryColor,
+                  unselectedLabelColor: Colors.grey,
+                  tabs: const [
+                    Tab(text: "Presensi"),
+                    Tab(text: "Tugas"),
+                    Tab(text: "Materi"),
+                  ],
+                ),
               ),
             ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.only(top: 20),
-            sliver: SliverToBoxAdapter(
-              child: ExpandablePageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  _tabController.animateTo(index);
+          ];
+        },
+        body: Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _daftarMahasiswa(),
+              // const TugasScreen(),
+              ListView.separated(
+                padding: const EdgeInsets.only(bottom: 20),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.sesi.learningMaterials!.length,
+                itemBuilder: (context, index) {
+                  final materi = widget.sesi.learningMaterials![index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(materi.originaFileName),
+                  );
                 },
-                children: [
-                  _daftarMahasiswa(),
-                  const Text("2"),
-                  const Text("3"),
-                ],
+                separatorBuilder: (BuildContext context, int index) {
+                  return const Divider(height: 32, thickness: 1);
+                },
               ),
-            ),
+              ListView.separated(
+                padding: const EdgeInsets.only(bottom: 20),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.sesi.learningMaterials!.length,
+                itemBuilder: (context, index) {
+                  final materi = widget.sesi.learningMaterials![index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(materi.originaFileName),
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return const Divider(height: 32, thickness: 1);
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Padding _daftarMahasiswa() {
+  SingleChildScrollView _daftarMahasiswa() {
     PresensiProvider presensiProvider = context.watch<PresensiProvider>();
     final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
 
@@ -160,138 +177,144 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
       _isMapInitialized = true;
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 15, left: 28, right: 28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              width: 105,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: selectedStatus,
-                  isExpanded: true,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
-                    color: Colors.white,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 15, left: 28, right: 28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                width: 105,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: selectedStatus,
+                    isExpanded: true,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.white,
+                    ),
+                    dropdownColor: AppColors.primaryColor,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    items: daftarHadirList.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedStatus = newValue!;
+                      });
+                    },
                   ),
-                  dropdownColor: AppColors.primaryColor,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                  items: daftarHadirList.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedStatus = newValue!;
-                    });
-                  },
                 ),
               ),
             ),
-          ),
-          presensiProvider.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : (dataPresensiMahasiswa == null)
-              ? const Center(child: Text("Presensi tidak ditemukan"))
-              : Column(
-                  children: [
-                    ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: dataPresensiMahasiswa.mahasiswa.length,
-                      itemBuilder: (context, index) {
-                        final sesi = dataPresensiMahasiswa.mahasiswa[index];
+            presensiProvider.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : (dataPresensiMahasiswa == null)
+                ? const Center(child: Text("Presensi tidak ditemukan"))
+                : Column(
+                    children: [
+                      ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: dataPresensiMahasiswa.mahasiswa.length,
+                        itemBuilder: (context, index) {
+                          final sesi = dataPresensiMahasiswa.mahasiswa[index];
 
-                        return PresensiMahasiswa(
-                          name: sesi.name,
-                          detailId: sesi.detailId,
-                          sesiId: dataPresensiMahasiswa.sesiId,
-
-                          currentStatus: _tempPresensiMap[sesi.detailId] ?? "",
-                          onStatusChanged: (newStatus) {
-                            setState(() {
-                              _tempPresensiMap[sesi.detailId] = newStatus;
-                            });
-                          },
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          List<DetailUpdatePresensiMahassiwa> listDetail = [];
-                          _tempPresensiMap.forEach((id, status) {
-                            if (status.isNotEmpty) {
-                              listDetail.add(
-                                DetailUpdatePresensiMahassiwa(
-                                  detailId: id,
-                                  status: status.toLowerCase(),
-                                ),
-                              );
-                            }
-                          });
-
-                          final payload = UpdatePresensiMahasiswa(
+                          return PresensiMahasiswa(
+                            name: sesi.name,
+                            detailId: sesi.detailId,
                             sesiId: dataPresensiMahasiswa.sesiId,
-                            detail: listDetail,
-                          );
 
-                          bool sukses = await context
-                              .read<PresensiProvider>()
-                              .updatePresensiMahasiswa(payload);
-
-                          if (!mounted) return;
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                sukses
-                                    ? "Semua data presensi berhasil diperbarui!"
-                                    : "Gagal menyimpan presensi",
-                              ),
-                              backgroundColor: sukses
-                                  ? Colors.green
-                                  : Colors.red,
-                            ),
+                            currentStatus:
+                                _tempPresensiMap[sesi.detailId] ?? "",
+                            onStatusChanged: (newStatus) {
+                              setState(() {
+                                _tempPresensiMap[sesi.detailId] = newStatus;
+                              });
+                            },
                           );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            List<DetailUpdatePresensiMahassiwa> listDetail = [];
+                            _tempPresensiMap.forEach((id, status) {
+                              if (status.isNotEmpty) {
+                                listDetail.add(
+                                  DetailUpdatePresensiMahassiwa(
+                                    detailId: id,
+                                    status: status.toLowerCase(),
+                                  ),
+                                );
+                              }
+                            });
+
+                            final payload = UpdatePresensiMahasiswa(
+                              sesiId: dataPresensiMahasiswa.sesiId,
+                              detail: listDetail,
+                            );
+
+                            bool sukses = await context
+                                .read<PresensiProvider>()
+                                .updatePresensiMahasiswa(payload);
+
+                            if (!mounted) return;
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  sukses
+                                      ? "Semua data presensi berhasil diperbarui!"
+                                      : "Gagal menyimpan presensi",
+                                ),
+                                backgroundColor: sukses
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          "Simpan",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                          child: const Text(
+                            "Simpan",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 50),
-                  ],
-                ),
-        ],
+                      const SizedBox(height: 50),
+                    ],
+                  ),
+          ],
+        ),
       ),
     );
   }

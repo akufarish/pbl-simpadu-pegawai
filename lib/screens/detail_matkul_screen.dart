@@ -39,7 +39,6 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
   @override
   Widget build(BuildContext context) {
     SesiProvider sesiProvider = context.watch<SesiProvider>();
-    List<Sesi>? dataSesi = sesiProvider.data;
 
     return Scaffold(
       appBar: AppBar(
@@ -107,9 +106,7 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
             children: [
               sesiProvider.isLoading
                   ? Center(child: CircularProgressIndicator())
-                  :
-                    // if (dataSesi != null)
-                    ListView.separated(
+                  : ListView.separated(
                       padding: const EdgeInsets.only(bottom: 20),
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
