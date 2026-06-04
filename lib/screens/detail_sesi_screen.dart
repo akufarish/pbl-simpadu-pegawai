@@ -136,7 +136,22 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                   final materi = widget.sesi.learningMaterials![index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(materi.originaFileName),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(materi.originaFileName),
+                        Spacer(),
+                        ElevatedButton.icon(
+                          onPressed: () {},
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            minimumSize: Size(50, 50),
+                          ),
+                          label: Icon(Icons.download, color: Colors.white),
+                        ),
+                      ],
+                    ),
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) {
@@ -152,7 +167,22 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                   final materi = widget.sesi.learningMaterials![index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(materi.originaFileName),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(materi.originaFileName),
+                        Spacer(),
+                        ElevatedButton.icon(
+                          onPressed: () {},
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            minimumSize: Size(50, 50),
+                          ),
+                          label: Icon(Icons.download, color: Colors.white),
+                        ),
+                      ],
+                    ),
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) {
