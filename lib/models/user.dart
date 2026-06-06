@@ -8,11 +8,9 @@ class LoginRequest {
 
   LoginRequest({required this.email, required this.password});
 
-  factory LoginRequest.fromJson(Map<String, dynamic> json) {
-    return LoginRequest(email: json["email"], password: json["password"]);
-  }
-
-  Map<String, dynamic> toJson() => {'email': email, 'password': password};
+  factory LoginRequest.fromJson(Map<String, dynamic> json) =>
+      _$LoginRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$LoginRequestToJson(this);
 }
 
 @JsonSerializable()
@@ -20,7 +18,9 @@ class RegisterRequest {
   final String name;
   final String email;
   final String password;
+  @JsonKey(name: "role_name")
   final String roleName;
+  @JsonKey(name: "detail_id")
   final String detailId;
 
   RegisterRequest({
@@ -31,29 +31,18 @@ class RegisterRequest {
     required this.detailId,
   });
 
-  factory RegisterRequest.fromJson(Map<String, dynamic> json) {
-    return RegisterRequest(
-      name: json["name"],
-      email: json["email"],
-      password: json["password"],
-      roleName: json["role_name"],
-      detailId: json["detail_id"],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "name": name,
-    "email": email,
-    "password": password,
-    "role_name": roleName,
-    "detail_id": detailId,
-  };
+  factory RegisterRequest.fromJson(Map<String, dynamic> json) =>
+      _$RegisterRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$RegisterRequestToJson(this);
 }
 
 @JsonSerializable()
 class LoginResponse {
+  @JsonKey(name: "access_token")
   final String accessToken;
+  @JsonKey(name: "refresh_token")
   final String refreshToken;
+  @JsonKey(name: "role_name")
   final String roleName;
 
   LoginResponse({
@@ -62,13 +51,9 @@ class LoginResponse {
     required this.roleName,
   });
 
-  factory LoginResponse.fromJson(Map<String, dynamic> json) {
-    return LoginResponse(
-      accessToken: json["access_token"],
-      refreshToken: json["refresh_token"],
-      roleName: json["role_name"],
-    );
-  }
+  factory LoginResponse.fromJson(Map<String, dynamic> json) =>
+      _$LoginResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$LoginResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -76,8 +61,11 @@ class UserResponse {
   final String id;
   final String name;
   final String email;
+  @JsonKey(name: "role_name")
   final String roleName;
+  @JsonKey(name: "detail_id")
   final String? detailId;
+  @JsonKey(name: "image_url")
   final String? imageUrl;
 
   UserResponse({
@@ -89,14 +77,19 @@ class UserResponse {
     required this.imageUrl,
   });
 
-  factory UserResponse.fromJson(Map<String, dynamic> json) {
-    return UserResponse(
-      id: json["id"],
-      name: json["name"],
-      email: json["email"],
-      roleName: json["role_name"],
-      detailId: json["detail_id"],
-      imageUrl: json["image_url"],
-    );
-  }
+  factory UserResponse.fromJson(Map<String, dynamic> json) =>
+      _$UserResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$UserResponseToJson(this);
+}
+
+@JsonSerializable()
+class RefreshTokenRequest {
+  @JsonKey(name: "refresh_token")
+  final String refreshToken;
+
+  RefreshTokenRequest({required this.refreshToken});
+
+  factory RefreshTokenRequest.fromJson(Map<String, dynamic> json) =>
+      _$RefreshTokenRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$RefreshTokenRequestToJson(this);
 }

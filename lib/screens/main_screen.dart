@@ -3,6 +3,8 @@ import 'package:pegawai/screens/mata_kuliah_screen.dart';
 import 'package:pegawai/screens/new_dashboard.dart';
 import 'package:pegawai/screens/profile_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
+import 'package:pegawai/utils/handle_permission.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -19,6 +21,16 @@ class _MainScreenState extends State<MainScreen> {
     MataKuliahScreen(),
     ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (mounted) {
+        await handlePermission(Permission.photos, "Photos");
+      }
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {

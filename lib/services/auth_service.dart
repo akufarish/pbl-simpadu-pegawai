@@ -13,8 +13,10 @@ class AuthService {
     try {
       final response = await ApiClient().dio.post(
         "$kelompok1Url/api/auth/login",
-        data: payload.toJson(),
+        data: payload,
       );
+
+      debugPrint("login $response");
 
       final result = ApiResponse<LoginResponse>.fromJson(
         response.data,
@@ -78,5 +80,56 @@ class AuthService {
 
     await TokenManager.setDetailId(result.data!.detailId!);
     return result.data!;
+  }
+
+  Future<bool> refreshToken(RefreshTokenRequest payload) async {
+    try {
+      final response = await ApiClient().dio.post(
+        "$kelompok1Url/api/auth/refresh-token",
+        data: payload,
+      );
+
+      debugPrint("refresh token: $response");
+      debugPrint("refresh token: ${payload.refreshToken}");
+
+      if (response.statusCode == 200) {
+        final result = ApiResponse<LoginResponse>.fromJson(
+          response.data,
+          (json) => LoginResponse.fromJson(json as Map<String, dynamic>),
+        );
+
+        await TokenManager.setToken(
+          result.data!.accessToken,
+          result.data!.refreshToken,
+        );
+        return true;
+      } else {
+        return false;
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        debugPrint(
+          "Validasi Gagal (Status ${e.response?.statusCode}): ${e.response?.data}",
+        );
+
+        try {
+          final errorResult = ApiResponse<dynamic>.fromJson(
+            e.response!.data,
+            (item) => item,
+          );
+          debugPrint(errorResult.error ?? errorResult.message);
+          return false;
+        } catch (_) {
+          debugPrint("Terjadi kesalahan pada parsing error server");
+          return false;
+        }
+      } else {
+        debugPrint("Koneksi gagal atau request dibatalkan: ${e.message}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("refresh token: $e");
+      return false;
+    }
   }
 }

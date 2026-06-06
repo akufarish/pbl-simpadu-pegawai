@@ -19,8 +19,8 @@ RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       email: json['email'] as String,
       password: json['password'] as String,
-      roleName: json['roleName'] as String,
-      detailId: json['detailId'] as String,
+      roleName: json['role_name'] as String,
+      detailId: json['detail_id'] as String,
     );
 
 Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
@@ -28,31 +28,31 @@ Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
       'name': instance.name,
       'email': instance.email,
       'password': instance.password,
-      'roleName': instance.roleName,
-      'detailId': instance.detailId,
+      'role_name': instance.roleName,
+      'detail_id': instance.detailId,
     };
 
 LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>
     LoginResponse(
-      accessToken: json['accessToken'] as String,
-      refreshToken: json['refreshToken'] as String,
-      roleName: json['roleName'] as String,
+      accessToken: json['access_token'] as String,
+      refreshToken: json['refresh_token'] as String,
+      roleName: json['role_name'] as String,
     );
 
 Map<String, dynamic> _$LoginResponseToJson(LoginResponse instance) =>
     <String, dynamic>{
-      'accessToken': instance.accessToken,
-      'refreshToken': instance.refreshToken,
-      'roleName': instance.roleName,
+      'access_token': instance.accessToken,
+      'refresh_token': instance.refreshToken,
+      'role_name': instance.roleName,
     };
 
 UserResponse _$UserResponseFromJson(Map<String, dynamic> json) => UserResponse(
   id: json['id'] as String,
   name: json['name'] as String,
   email: json['email'] as String,
-  roleName: json['roleName'] as String,
-  detailId: json['detailId'] as String?,
-  imageUrl: json['imageUrl'] as String?,
+  roleName: json['role_name'] as String,
+  detailId: json['detail_id'] as String?,
+  imageUrl: json['image_url'] as String?,
 );
 
 Map<String, dynamic> _$UserResponseToJson(UserResponse instance) =>
@@ -60,7 +60,14 @@ Map<String, dynamic> _$UserResponseToJson(UserResponse instance) =>
       'id': instance.id,
       'name': instance.name,
       'email': instance.email,
-      'roleName': instance.roleName,
-      'detailId': instance.detailId,
-      'imageUrl': instance.imageUrl,
+      'role_name': instance.roleName,
+      'detail_id': instance.detailId,
+      'image_url': instance.imageUrl,
     };
+
+RefreshTokenRequest _$RefreshTokenRequestFromJson(Map<String, dynamic> json) =>
+    RefreshTokenRequest(refreshToken: json['refresh_token'] as String);
+
+Map<String, dynamic> _$RefreshTokenRequestToJson(
+  RefreshTokenRequest instance,
+) => <String, dynamic>{'refresh_token': instance.refreshToken};
