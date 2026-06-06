@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:pegawai/providers/materi_provider.dart';
+import 'package:pegawai/providers/pegawai_provider.dart';
 import 'package:pegawai/providers/pengampu_provider.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/providers/tugas_provider.dart';
 import 'package:pegawai/providers/user_provider.dart';
+import 'package:pegawai/providers/wilayah_provider.dart';
 import 'package:pegawai/screens/kalender_screen.dart';
 import 'package:pegawai/screens/login_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pegawai/screens/main_screen.dart';
 import 'package:pegawai/screens/new_dashboard.dart';
+import 'package:pegawai/screens/update_profile_screen.dart';
 import 'package:pegawai/screens/upload_tugas_screen.dart';
 import 'package:pegawai/utils/token_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 void main() async {
   await dotenv.load();
@@ -22,7 +26,7 @@ void main() async {
   String? token = await TokenManager.getAccessToken();
   Widget screen = LoginScreen();
 
-  if (token != null) {
+  if (token != null && !JwtDecoder.isExpired(token)) {
     screen = MainScreen();
   }
 
@@ -35,6 +39,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => PengampuProvider()),
         ChangeNotifierProvider(create: (_) => TugasProvider()),
         ChangeNotifierProvider(create: (_) => MateriProvider()),
+        ChangeNotifierProvider(create: (_) => WilayahProvider()),
+        ChangeNotifierProvider(create: (_) => PegawaiProvider()),
       ],
       child: MainApp(screen: screen),
     ),
@@ -56,6 +62,7 @@ class MainApp extends StatelessWidget {
         "/kalender": (context) => KalenderScreen(),
         "/main-screen": (context) => MainScreen(),
         "/upload-tugas": (context) => UploadTugas(),
+        "/update-profile": (context) => UpdateProfileScreen(),
       },
     );
   }

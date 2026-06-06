@@ -6,16 +6,28 @@ class PegawaiResponse {
   final String id;
   final String nip;
   final String nik;
+  @JsonKey(name: "employee_name")
   final String employeeName;
   final String? address;
+  @JsonKey(name: "birth_place")
   final String? birthPlace;
+  @JsonKey(name: "birth_date")
   final String? birthDate;
   final String? gender;
+  @JsonKey(name: "phone_number")
   final String? phoneNumber;
+  @JsonKey(name: "village_code")
   final String? villageCode;
+  @JsonKey(name: "district_code")
   final String? districtCode;
+  @JsonKey(name: "city_code")
   final String? cityCode;
+  @JsonKey(name: "province_code")
   final String? provinceCode;
+  @JsonKey(name: "study_program_id")
+  final String? studyProgramId;
+  @JsonKey(name: "citizen_code")
+  final String? citizenCode;
 
   final Domisili? village;
   final Domisili? district;
@@ -40,6 +52,8 @@ class PegawaiResponse {
     this.cityCode,
     this.province,
     this.provinceCode,
+    this.citizenCode,
+    this.studyProgramId,
   });
 
   factory PegawaiResponse.fromJson(Map<String, dynamic> json) =>
@@ -77,4 +91,59 @@ class Domisili {
   factory Domisili.fromJson(Map<String, dynamic> json) =>
       _$DomisiliFromJson(json);
   Map<String, dynamic> toJson() => _$DomisiliToJson(this);
+}
+
+@JsonSerializable()
+class UpdatePegawaiRequest {
+  final String? nip;
+  final String? nik;
+  @JsonKey(name: "employee_name")
+  final String? employeeName;
+  @JsonKey(name: "study_program_id")
+  final String? studyProgramId;
+  @JsonKey(name: "study_program_name")
+  final String? studyProgramName;
+  final String? address;
+  @JsonKey(name: "birth_place")
+  final String? birthPlace;
+  @JsonKey(name: "birth_date")
+  final String? birthDate;
+  final String? gender;
+  @JsonKey(name: "phone_number")
+  final String? phoneNumber;
+  @JsonKey(name: "village_code")
+  final String? villageCode;
+  @JsonKey(name: "district_code")
+  final String? districtCode;
+  @JsonKey(name: "city_code")
+  final String? cityCode;
+  @JsonKey(name: "province_code")
+  final String? provinceCode;
+  @JsonKey(name: "citizen_code")
+  final String? citizenCode;
+  @JsonKey(name: "image_url")
+  final String? imageUrl;
+
+  UpdatePegawaiRequest({
+    this.nip,
+    this.nik,
+    this.employeeName,
+    this.address,
+    this.birthDate,
+    this.birthPlace,
+    this.citizenCode,
+    this.cityCode,
+    this.districtCode,
+    this.gender,
+    this.phoneNumber,
+    this.provinceCode,
+    this.studyProgramId,
+    this.studyProgramName,
+    this.villageCode,
+    this.imageUrl,
+  });
+
+  factory UpdatePegawaiRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdatePegawaiRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$UpdatePegawaiRequestToJson(this);
 }

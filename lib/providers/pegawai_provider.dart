@@ -23,4 +23,20 @@ class PegawaiProvider with ChangeNotifier {
       return null;
     }
   }
+
+  Future<bool> updatePegawai(UpdatePegawaiRequest payload, String id) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      bool isSuccess = await pegawaiService.updateDataPegawai(payload, id);
+      isLoading = false;
+      notifyListeners();
+      return isSuccess;
+    } catch (e) {
+      debugPrint("$e");
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
 }

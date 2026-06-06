@@ -44,4 +44,52 @@ class PegawaiService {
       throw Exception('Network error: $e');
     }
   }
+
+  Future<bool> updateDataPegawai(
+    UpdatePegawaiRequest payload,
+    String id,
+  ) async {
+    try {
+      debugPrint("update pegawai payload: $payload");
+      final response = await ApiClient().dio.put(
+        "$kelompok2Url/api/employees/$id",
+        data: payload.toJson(),
+      );
+
+      debugPrint("update pegawai: $response");
+
+      if (response.statusCode == 200) {
+        debugPrint("update pegawai: ${response.data}");
+        return true;
+      } else {
+        return false;
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        debugPrint(
+          "update pegawai (Status ${e.response?.statusCode}): ${e.response?.data}",
+        );
+
+        try {
+          final errorResult = ApiResponse<dynamic>.fromJson(
+            e.response!.data,
+            (item) => item,
+          );
+          debugPrint(
+            "Update pegawai: ${errorResult.error ?? errorResult.message}",
+          );
+          return false;
+        } catch (_) {
+          debugPrint("update pegawai");
+          return false;
+        }
+      } else {
+        debugPrint("update pegawai: ${e.message}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("update pegawai: $e");
+      return false;
+    }
+  }
 }

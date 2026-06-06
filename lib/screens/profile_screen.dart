@@ -57,6 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: _profileCard(
                       userProvider.data!.name,
                       userProvider.dataPegawai?.nik ?? "joy",
+                      context,
                     ),
                   ),
                 ),
@@ -168,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-Card _profileCard(String nama, String email) {
+Card _profileCard(String nama, String email, BuildContext context) {
   final request = DiceBearRequest(
     style: DiceBearStyle.initials,
     coreOptions: DiceBearCoreOptions(seed: nama),
@@ -194,14 +195,31 @@ Card _profileCard(String nama, String email) {
             ),
           ),
           Spacer(),
-          Container(
+          // Container(
+          //   width: 50,
+          //   height: 50,
+          //   decoration: BoxDecoration(
+          //     color: AppColors.primaryColor,
+          //     borderRadius: BorderRadius.circular(10),
+          //   ),
+          //   child: Center(child: Icon(Icons.edit, color: Colors.white)),
+          // ),
+          SizedBox(
             width: 50,
             height: 50,
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              borderRadius: BorderRadius.circular(10),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, "/update-profile");
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(10),
+                ),
+                backgroundColor: AppColors.primaryColor,
+              ),
+              label: Center(child: Icon(Icons.edit, color: Colors.white)),
             ),
-            child: Center(child: Icon(Icons.edit, color: Colors.white)),
           ),
         ],
       ),
