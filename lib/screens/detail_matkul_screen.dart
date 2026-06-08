@@ -5,6 +5,7 @@ import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/screens/tugas_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class DetailMatkulScreen extends StatefulWidget {
   final Pengampu pengampu;
@@ -103,24 +104,25 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
           child: TabBarView(
             controller: _tabController,
             children: [
-              sesiProvider.isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : ListView.separated(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: sesiProvider.data!.length,
-                      itemBuilder: (context, index) {
-                        final sesi = sesiProvider.data![index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: SesiCard(dataSesi: sesi),
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const Divider(height: 32, thickness: 1);
-                      },
-                    ),
+              Skeletonizer(
+                enabled: sesiProvider.isLoading,
+                child: ListView.separated(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: sesiProvider.data!.length,
+                  itemBuilder: (context, index) {
+                    final sesi = sesiProvider.data![index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: SesiCard(dataSesi: sesi),
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const Divider(height: 32, thickness: 1);
+                  },
+                ),
+              ),
               const TugasScreen(),
               const Center(child: Text("Konten Materi")),
             ],

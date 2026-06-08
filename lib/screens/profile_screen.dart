@@ -30,6 +30,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final UserResponse? user = userProvider.data;
     final dataPegawai = userProvider.dataPegawai;
 
+    void doLogout() async {
+      final provider = context.read<UserProvider>();
+      bool isSuccess = await provider.logout();
+
+      if (!mounted) return;
+
+      if (isSuccess) {
+        Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Samting Wong")));
+      }
+    }
+
     return Scaffold(
       body: userProvider.isLoading || user == null || dataPegawai == null
           ? Center(
@@ -158,6 +173,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SliverPadding(
+                  padding: EdgeInsetsGeometry.only(top: 12),
+                  sliver: SliverToBoxAdapter(
+                    child: Center(
+                      child: SizedBox(
+                        width: 150,
+                        child: ElevatedButton(
+                          onPressed: userProvider.isLoading ? null : doLogout,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadiusGeometry.circular(5),
+                            ),
+                          ),
+                          child: userProvider.isLoading
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  "Logout",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                         ),
                       ),
                     ),

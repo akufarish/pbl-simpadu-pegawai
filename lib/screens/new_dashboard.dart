@@ -8,6 +8,7 @@ import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/providers/user_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class NewDashboard extends StatefulWidget {
   const NewDashboard({super.key});
@@ -208,130 +209,126 @@ class _NewDashboardState extends State<NewDashboard> {
             ),
             SliverPadding(
               padding: EdgeInsetsGeometry.only(top: 15),
-              sliver: presensiProvider.isLoading
-                  ? SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : SliverToBoxAdapter(
-                      child: InkWell(
-                        onTap: dataPresensi == null
-                            ? _openPresensiDialog
-                            : () {},
-                        child: Container(
-                          width: double.infinity,
-                          height: 86,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: Colors.white,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  dataPresensi != null
-                                      ? Icons.verified
-                                      : Icons.close,
-                                  color: dataPresensi != null
-                                      ? Colors.green
-                                      : Colors.redAccent,
-                                  size: 64,
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  dataPresensi != null
-                                      ? "Kamu sudah presensi hari ini"
-                                      : "Kamu belum presensi hari ini",
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+              sliver: SliverSkeletonizer(
+                enabled: presensiProvider.isLoading,
+                child: SliverToBoxAdapter(
+                  child: InkWell(
+                    onTap: dataPresensi == null ? _openPresensiDialog : () {},
+                    child: Container(
+                      width: double.infinity,
+                      height: 86,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.white,
                       ),
-                    ),
-            ),
-            SliverPadding(
-              padding: EdgeInsetsGeometry.only(top: 15),
-              sliver: sesiProvider.isLoading
-                  ? const SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : SliverToBoxAdapter(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Row(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 20,
-                                left: 20,
-                                right: 20,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Kelas hari ini",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                  Text(
-                                    DateFormat(
-                                      'EEEE, d MMM',
-                                      'id_ID',
-                                    ).format(DateTime.now()),
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            Icon(
+                              dataPresensi != null
+                                  ? Icons.verified
+                                  : Icons.close,
+                              color: dataPresensi != null
+                                  ? Colors.green
+                                  : Colors.redAccent,
+                              size: 64,
                             ),
-                            const SizedBox(height: 20),
-
-                            if (sesiProvider.data != null &&
-                                sesiProvider.data!.isNotEmpty)
-                              ListView.separated(
-                                padding: const EdgeInsets.only(bottom: 20),
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: sesiProvider.data!.length,
-                                itemBuilder: (context, index) {
-                                  final sesi = sesiProvider.data![index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                    ),
-                                    child: SesiCard(dataSesi: sesi),
-                                  );
-                                },
-                                separatorBuilder:
-                                    (BuildContext context, int index) {
-                                      return const Divider(
-                                        height: 32,
-                                        thickness: 1,
-                                      );
-                                    },
-                              )
-                            else
-                              const Padding(
-                                padding: EdgeInsets.only(top: 12, bottom: 50),
-                                child: Center(
-                                  child: Text("Tidak ada kelas hari ini"),
-                                ),
-                              ),
+                            SizedBox(width: 10),
+                            Text(
+                              dataPresensi != null
+                                  ? "Kamu sudah presensi hari ini"
+                                  : "Kamu belum presensi hari ini",
+                            ),
                           ],
                         ),
                       ),
                     ),
+                  ),
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: EdgeInsetsGeometry.only(top: 15),
+              sliver: SliverSkeletonizer(
+                enabled: sesiProvider.isLoading,
+                child: SliverToBoxAdapter(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 20,
+                            left: 20,
+                            right: 20,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Kelas hari ini",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              Text(
+                                DateFormat(
+                                  'EEEE, d MMM',
+                                  'id_ID',
+                                ).format(DateTime.now()),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        if (sesiProvider.data != null &&
+                            sesiProvider.data!.isNotEmpty)
+                          ListView.separated(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: sesiProvider.data!.length,
+                            itemBuilder: (context, index) {
+                              final sesi = sesiProvider.data![index];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
+                                child: SesiCard(dataSesi: sesi),
+                              );
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) {
+                                  return const Divider(
+                                    height: 32,
+                                    thickness: 1,
+                                  );
+                                },
+                          )
+                        else
+                          const Padding(
+                            padding: EdgeInsets.only(top: 12, bottom: 50),
+                            child: Center(
+                              child: Text("Tidak ada kelas hari ini"),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

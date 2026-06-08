@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pegawai/providers/materi_provider.dart';
 import 'package:pegawai/providers/pegawai_provider.dart';
 import 'package:pegawai/providers/pengampu_provider.dart';
@@ -55,6 +56,9 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+      ),
       home: Scaffold(body: screen),
       routes: {
         "/login": (context) => LoginScreen(),
