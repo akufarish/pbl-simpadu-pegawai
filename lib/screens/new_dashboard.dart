@@ -57,6 +57,9 @@ class _NewDashboardState extends State<NewDashboard> {
     final PresensiProvider presensiProvider = context.watch<PresensiProvider>();
     final PresensiPegawaiResponse? dataPresensi = presensiProvider.data;
 
+    List<String> listStatusPresensi = ["Hadir", "Sakit", "Alpha"];
+    String? selectedStatusPresensi;
+
     void doCreatePresensi() async {
       bool isSuccess = await presensiProvider.createPresensi();
 
@@ -71,164 +74,21 @@ class _NewDashboardState extends State<NewDashboard> {
       }
     }
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(left: 12, right: 12),
-        child: PageView(
-          children: [
-            CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: EdgeInsetsGeometry.only(
-                    top: 28,
-                    left: 12,
-                    right: 12,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Selamat Datang, ${user?.name ?? "Joy"}",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              (sesiProvider.data == null ||
-                                      sesiProvider.data!.isEmpty)
-                                  ? "Tidak ada kelas hari ini"
-                                  : "Kamu ada ngajar ${sesiProvider.data!.length} kelas hari ini",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          onPressed: () =>
-                              Navigator.pushNamed(context, "/kalender"),
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          icon: const Icon(
-                            Icons.calendar_month,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: EdgeInsetsGeometry.only(top: 15),
-                  sliver: sesiProvider.isLoading
-                      ? const SliverToBoxAdapter(
-                          child: Center(child: CircularProgressIndicator()),
-                        )
-                      : SliverToBoxAdapter(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 20,
-                                    left: 20,
-                                    right: 20,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Kelas hari ini",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: Colors.grey[700],
-                                        ),
-                                      ),
-                                      Text(
-                                        DateFormat(
-                                          'EEEE, d MMM',
-                                          'id_ID',
-                                        ).format(DateTime.now()),
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-
-                                if (sesiProvider.data != null &&
-                                    sesiProvider.data!.isNotEmpty)
-                                  ListView.separated(
-                                    padding: const EdgeInsets.only(bottom: 20),
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: sesiProvider.data!.length,
-                                    itemBuilder: (context, index) {
-                                      final sesi = sesiProvider.data![index];
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 20,
-                                        ),
-                                        child: SesiCard(dataSesi: sesi),
-                                      );
-                                    },
-                                    separatorBuilder:
-                                        (BuildContext context, int index) {
-                                          return const Divider(
-                                            height: 32,
-                                            thickness: 1,
-                                          );
-                                        },
-                                  )
-                                else
-                                  const Padding(
-                                    padding: EdgeInsets.only(
-                                      top: 12,
-                                      bottom: 50,
-                                    ),
-                                    child: Center(
-                                      child: Text("Tidak ada kelas hari ini"),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                ),
-              ],
-            ),
-            Center(
-              child: Container(
-                width: 377,
-                height: 348,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+    void _openPresensiDialog() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setStateDialog) {
+              return Dialog(
+                backgroundColor: AppColors.backgroundColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(12),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(24.0),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -237,75 +97,241 @@ class _NewDashboardState extends State<NewDashboard> {
                           'id_ID',
                         ).format(DateTime.now()),
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Spacer(),
-                      if (dataPresensi != null)
-                        Center(
-                          child: Column(
-                            children: [
-                              const Icon(
-                                Icons.verified,
-                                size: 64,
-                                color: Colors.greenAccent,
-                              ),
-                              const SizedBox(height: 12),
-                              const Text("Kamu Sudah Presensi Hari Ini"),
-                              const SizedBox(height: 20),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                onPressed: null,
-                                child: const Text(
-                                  "Presensi",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      else
-                        Center(
-                          child: Column(
-                            children: [
-                              const Icon(
-                                Icons.close,
-                                size: 64,
-                                color: Colors.redAccent,
-                              ),
-                              const SizedBox(height: 12),
-                              const Text("Kamu Belum Presensi Hari Ini"),
-                              const SizedBox(height: 20),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                onPressed: presensiProvider.isLoading
-                                    ? null
-                                    : doCreatePresensi,
-                                child: const Text(
-                                  "Presensi",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
+                      SizedBox(height: 11),
+                      Text(
+                        "Status Kehadiran",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
                         ),
-
-                      const Spacer(),
+                      ),
+                      SizedBox(height: 11),
+                      DropdownButtonFormField(
+                        initialValue: listStatusPresensi[0],
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        items: listStatusPresensi.map((item) {
+                          return DropdownMenuItem(
+                            value: item,
+                            child: Text(item),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setStateDialog(() {
+                            selectedStatusPresensi = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 11),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: presensiProvider.isLoading
+                              ? null
+                              : doCreatePresensi,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          child: Text("Presensi"),
+                        ),
+                      ),
                     ],
                   ),
                 ),
+              );
+            },
+          );
+        },
+      );
+    }
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.only(left: 12, right: 12),
+        child: CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: EdgeInsetsGeometry.only(top: 28, left: 12, right: 12),
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Selamat Datang, ${user?.name ?? "Joy"}",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          (sesiProvider.data == null ||
+                                  sesiProvider.data!.isEmpty)
+                              ? "Tidak ada kelas hari ini"
+                              : "Kamu ada ngajar ${sesiProvider.data!.length} kelas hari ini",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          Navigator.pushNamed(context, "/kalender"),
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(
+                        Icons.calendar_month,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+            ),
+            SliverPadding(
+              padding: EdgeInsetsGeometry.only(top: 15),
+              sliver: presensiProvider.isLoading
+                  ? SliverToBoxAdapter(
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : SliverToBoxAdapter(
+                      child: InkWell(
+                        onTap: dataPresensi == null
+                            ? _openPresensiDialog
+                            : () {},
+                        child: Container(
+                          width: double.infinity,
+                          height: 86,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.white,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  dataPresensi != null
+                                      ? Icons.verified
+                                      : Icons.close,
+                                  color: dataPresensi != null
+                                      ? Colors.green
+                                      : Colors.redAccent,
+                                  size: 64,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  dataPresensi != null
+                                      ? "Kamu sudah presensi hari ini"
+                                      : "Kamu belum presensi hari ini",
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+            ),
+            SliverPadding(
+              padding: EdgeInsetsGeometry.only(top: 15),
+              sliver: sesiProvider.isLoading
+                  ? const SliverToBoxAdapter(
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : SliverToBoxAdapter(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 20,
+                                left: 20,
+                                right: 20,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Kelas hari ini",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                  Text(
+                                    DateFormat(
+                                      'EEEE, d MMM',
+                                      'id_ID',
+                                    ).format(DateTime.now()),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+
+                            if (sesiProvider.data != null &&
+                                sesiProvider.data!.isNotEmpty)
+                              ListView.separated(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: sesiProvider.data!.length,
+                                itemBuilder: (context, index) {
+                                  final sesi = sesiProvider.data![index];
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                    ),
+                                    child: SesiCard(dataSesi: sesi),
+                                  );
+                                },
+                                separatorBuilder:
+                                    (BuildContext context, int index) {
+                                      return const Divider(
+                                        height: 32,
+                                        thickness: 1,
+                                      );
+                                    },
+                              )
+                            else
+                              const Padding(
+                                padding: EdgeInsets.only(top: 12, bottom: 50),
+                                child: Center(
+                                  child: Text("Tidak ada kelas hari ini"),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),

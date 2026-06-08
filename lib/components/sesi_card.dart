@@ -172,7 +172,7 @@ class _SesiCardState extends State<SesiCard> {
                   widget.dataSesi.lecturer.employeeName,
                 ),
                 const SizedBox(height: 4),
-                _buildInfoRow(Icons.book, widget.dataSesi.id),
+                _buildInfoRow(Icons.book, widget.dataSesi.className),
               ],
             ),
           ),
