@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 285,
               ),
               Text(
-                "SIMPADU",
+                "SABAR",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

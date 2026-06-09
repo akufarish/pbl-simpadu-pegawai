@@ -6,6 +6,7 @@ import 'package:pegawai/providers/materi_provider.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class DetailSesiScreen extends StatefulWidget {
   final Sesi sesi;
@@ -17,26 +18,14 @@ class DetailSesiScreen extends StatefulWidget {
 
 class _DetailSesiScreenState extends State<DetailSesiScreen>
     with SingleTickerProviderStateMixin {
-  final List<String> daftarHadirList = [
-    "Hadir",
-    "Sakit",
-    "Alpha",
-    "Izin",
-    "Status",
-  ];
   late TabController _tabController;
   late PageController _pageController;
-  String? selectedStatus;
-
-  final Map<String, String> _tempPresensiMap = {};
-  bool _isMapInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _pageController = PageController();
-    selectedStatus = "Status";
 
     Future.microtask(() {
       if (mounted) {
@@ -64,11 +53,11 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
       if (result) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Download file berhasil")));
+        ).showSnackBar(const SnackBar(content: Text("Download file berhasil")));
       } else {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Download file gagal")));
+        ).showSnackBar(const SnackBar(content: Text("Download file gagal")));
       }
     }
   }
@@ -142,12 +131,10 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
           child: TabBarView(
             controller: _tabController,
             children: [
-              _daftarMahasiswa(),
-              // const TugasScreen(),
+              DaftarMahasiswaTab(sesi: widget.sesi),
+
               ListView.separated(
                 padding: const EdgeInsets.only(bottom: 20),
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
                 itemCount: widget.sesi.learningMaterials!.length,
                 itemBuilder: (context, index) {
                   final materi = widget.sesi.learningMaterials![index];
@@ -158,14 +145,17 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(materi.originaFileName),
-                        Spacer(),
+                        const Spacer(),
                         ElevatedButton.icon(
                           onPressed: () {},
-                          style: IconButton.styleFrom(
+                          style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
-                            minimumSize: Size(50, 50),
+                            minimumSize: const Size(50, 50),
                           ),
-                          label: Icon(Icons.download, color: Colors.white),
+                          label: const Icon(
+                            Icons.download,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -177,8 +167,6 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
               ),
               ListView.separated(
                 padding: const EdgeInsets.only(bottom: 20),
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
                 itemCount: widget.sesi.learningMaterials!.length,
                 itemBuilder: (context, index) {
                   final materi = widget.sesi.learningMaterials![index];
@@ -189,15 +177,18 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(materi.originaFileName),
-                        Spacer(),
+                        const Spacer(),
                         ElevatedButton.icon(
                           onPressed: () =>
                               downloadMateri(materi.id, materi.originaFileName),
-                          style: IconButton.styleFrom(
+                          style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
-                            minimumSize: Size(50, 50),
+                            minimumSize: const Size(50, 50),
                           ),
-                          label: Icon(Icons.download, color: Colors.white),
+                          label: const Icon(
+                            Icons.download,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -209,159 +200,6 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  SingleChildScrollView _daftarMahasiswa() {
-    PresensiProvider presensiProvider = context.watch<PresensiProvider>();
-    final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
-
-    if (dataPresensiMahasiswa != null && !_isMapInitialized) {
-      for (var mhs in dataPresensiMahasiswa.mahasiswa) {
-        _tempPresensiMap[mhs.detailId] = mhs.status;
-      }
-      _isMapInitialized = true;
-    }
-
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 15, left: 28, right: 28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                width: 105,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: selectedStatus,
-                    isExpanded: true,
-                    icon: const Icon(
-                      Icons.keyboard_arrow_down,
-                      color: Colors.white,
-                    ),
-                    dropdownColor: AppColors.primaryColor,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                    items: daftarHadirList.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedStatus = newValue!;
-                      });
-                    },
-                  ),
-                ),
-              ),
-            ),
-            presensiProvider.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : (dataPresensiMahasiswa == null)
-                ? const Center(child: Text("Presensi tidak ditemukan"))
-                : Column(
-                    children: [
-                      ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: dataPresensiMahasiswa.mahasiswa.length,
-                        itemBuilder: (context, index) {
-                          final sesi = dataPresensiMahasiswa.mahasiswa[index];
-
-                          return PresensiMahasiswa(
-                            name: sesi.name,
-                            detailId: sesi.detailId,
-                            sesiId: dataPresensiMahasiswa.sesiId,
-
-                            currentStatus:
-                                _tempPresensiMap[sesi.detailId] ?? "",
-                            onStatusChanged: (newStatus) {
-                              setState(() {
-                                _tempPresensiMap[sesi.detailId] = newStatus;
-                              });
-                            },
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            List<DetailUpdatePresensiMahassiwa> listDetail = [];
-                            _tempPresensiMap.forEach((id, status) {
-                              if (status.isNotEmpty) {
-                                listDetail.add(
-                                  DetailUpdatePresensiMahassiwa(
-                                    detailId: id,
-                                    status: status.toLowerCase(),
-                                  ),
-                                );
-                              }
-                            });
-
-                            final payload = UpdatePresensiMahasiswa(
-                              sesiId: dataPresensiMahasiswa.sesiId,
-                              detail: listDetail,
-                            );
-
-                            bool sukses = await context
-                                .read<PresensiProvider>()
-                                .updatePresensiMahasiswa(payload);
-
-                            if (!mounted) return;
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  sukses
-                                      ? "Semua data presensi berhasil diperbarui!"
-                                      : "Gagal menyimpan presensi",
-                                ),
-                                backgroundColor: sukses
-                                    ? Colors.green
-                                    : Colors.red,
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            "Simpan",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 50),
-                    ],
-                  ),
-          ],
         ),
       ),
     );
@@ -382,6 +220,170 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
             ),
           ),
         ),
+      ],
+    );
+  }
+}
+
+class DaftarMahasiswaTab extends StatefulWidget {
+  final Sesi sesi;
+  const DaftarMahasiswaTab({super.key, required this.sesi});
+
+  @override
+  State<DaftarMahasiswaTab> createState() => _DaftarMahasiswaTabState();
+}
+
+class _DaftarMahasiswaTabState extends State<DaftarMahasiswaTab> {
+  final List<String> daftarHadirList = [
+    "Hadir",
+    "Sakit",
+    "Alpha",
+    "Izin",
+    "Status",
+  ];
+  String selectedStatus = "Status";
+  final Map<String, String> _tempPresensiMap = {};
+  bool _isMapInitialized = false;
+
+  @override
+  Widget build(BuildContext context) {
+    PresensiProvider presensiProvider = context.watch<PresensiProvider>();
+    final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
+
+    if (dataPresensiMahasiswa != null && !_isMapInitialized) {
+      for (var mhs in dataPresensiMahasiswa.mahasiswa) {
+        _tempPresensiMap[mhs.detailId] = mhs.status;
+      }
+      _isMapInitialized = true;
+    }
+
+    if (dataPresensiMahasiswa == null ||
+        dataPresensiMahasiswa.mahasiswa.isEmpty) {
+      return const Center(child: Text("Presensi tidak ditemukan"));
+    }
+
+    return ListView(
+      padding: const EdgeInsets.only(top: 15, left: 28, right: 28),
+      children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: Container(
+            width: 105,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: selectedStatus,
+                isExpanded: true,
+                icon: const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Colors.white,
+                ),
+                dropdownColor: AppColors.primaryColor,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                items: daftarHadirList.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedStatus = newValue!;
+                  });
+                },
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Skeletonizer(
+          enabled: presensiProvider.isLoading,
+          child: ListView.builder(
+            padding: const EdgeInsets.only(bottom: 20),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: dataPresensiMahasiswa.mahasiswa.length,
+            itemBuilder: (context, index) {
+              final mhs = dataPresensiMahasiswa.mahasiswa[index];
+
+              return PresensiMahasiswa(
+                name: mhs.name,
+                detailId: mhs.detailId,
+                sesiId: dataPresensiMahasiswa.sesiId,
+                currentStatus: _tempPresensiMap[mhs.detailId] ?? "",
+                onStatusChanged: (newStatus) {
+                  setState(() {
+                    _tempPresensiMap[mhs.detailId] = newStatus;
+                  });
+                },
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: ElevatedButton(
+            onPressed: () async {
+              List<DetailUpdatePresensiMahassiwa> listDetail = [];
+              _tempPresensiMap.forEach((id, status) {
+                if (status.isNotEmpty) {
+                  listDetail.add(
+                    DetailUpdatePresensiMahassiwa(
+                      detailId: id,
+                      status: status.toLowerCase(),
+                    ),
+                  );
+                }
+              });
+
+              final payload = UpdatePresensiMahasiswa(
+                sesiId: dataPresensiMahasiswa.sesiId,
+                detail: listDetail,
+              );
+
+              bool sukses = await context
+                  .read<PresensiProvider>()
+                  .updatePresensiMahasiswa(payload);
+
+              if (!mounted) return;
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    sukses
+                        ? "Semua data presensi berhasil diperbarui!"
+                        : "Gagal menyimpan presensi",
+                  ),
+                  backgroundColor: sukses ? Colors.green : Colors.red,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text(
+              "Simpan",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 50),
       ],
     );
   }
