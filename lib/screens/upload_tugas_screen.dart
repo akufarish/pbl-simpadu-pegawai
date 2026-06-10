@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:pegawai/models/tugas.dart';
 import 'package:pegawai/providers/materi_provider.dart';
 import 'package:pegawai/providers/pengampu_provider.dart';
@@ -10,6 +11,7 @@ import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/providers/tugas_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class UploadTugas extends StatefulWidget {
   const UploadTugas({super.key});
@@ -26,6 +28,7 @@ class _UploadTugasState extends State<UploadTugas> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   DateTime? selectedDate;
+  final _key = GlobalKey<ExpandableFabState>();
 
   @override
   void initState() {
@@ -491,87 +494,132 @@ class _UploadTugasState extends State<UploadTugas> {
   Widget build(BuildContext context) {
     TugasProvider tugasProvider = context.watch<TugasProvider>();
     return Scaffold(
-      body: tugasProvider.isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.only(left: 12, right: 12),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.75,
-                ),
-                itemCount: tugasProvider.data.length,
-                itemBuilder: (context, index) {
-                  final Tugas tugas = tugasProvider.data[index];
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 12, right: 12),
+        child: Skeletonizer(
+          enabled: tugasProvider.isLoading,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 0.75,
+            ),
+            itemCount: tugasProvider.data.length,
+            itemBuilder: (context, index) {
+              final Tugas tugas = tugasProvider.data[index];
 
-                  return SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: Card(
-                      child: InkWell(
-                        onTap: () => {doMultiSelection(tugas.id)},
-                        onLongPress: () {
-                          if (!isMultiSelectEnabled) {
-                            isMultiSelectEnabled = true;
-                          }
-                          doMultiSelection(tugas.id);
-                        },
-                        child: Stack(
-                          children: [
-                            Align(
-                              alignment: Alignment.center,
-                              child: Icon(Icons.file_copy_rounded, size: 50),
+              return SizedBox(
+                width: 100,
+                height: 100,
+                child: Card(
+                  child: InkWell(
+                    onTap: () => {doMultiSelection(tugas.id)},
+                    onLongPress: () {
+                      if (!isMultiSelectEnabled) {
+                        isMultiSelectEnabled = true;
+                      }
+                      doMultiSelection(tugas.id);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Stack(
+                        children: [
+                          Align(
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.file_copy_rounded,
+                              size: 50,
+                              color: selectedItem.contains(tugas.id)
+                                  ? AppColors.primaryColor
+                                  : Colors.black,
                             ),
-                            SizedBox(height: 12),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Text(
-                                tugas.originaFileName,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 12),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Text(
+                              tugas.originaFileName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: selectedItem.contains(tugas.id)
+                                    ? AppColors.primaryColor
+                                    : Colors.black,
                               ),
                             ),
-                            Visibility(
-                              visible: selectedItem.contains(tugas.id),
-                              child: Align(
-                                alignment: Alignment.center,
+                          ),
+                          Visibility(
+                            visible: selectedItem.contains(tugas.id),
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                width: 35,
+                                height: 35,
                                 child: Icon(
                                   Icons.check,
-                                  color: Colors.white,
-                                  size: 30,
+                                  color: AppColors.backgroundColor,
+                                  size: 25,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton: ExpandableFab(
+        type: ExpandableFabType.up,
+        openButtonBuilder: DefaultFloatingActionButtonBuilder(
+          child: Icon(Icons.add),
+          fabSize: ExpandableFabSize.regular,
+          foregroundColor: AppColors.backgroundColor,
+          backgroundColor: AppColors.primaryColor,
+          shape: const CircleBorder(),
+        ),
+        closeButtonBuilder: DefaultFloatingActionButtonBuilder(
+          child: Icon(Icons.close),
+          fabSize: ExpandableFabSize.regular,
+          foregroundColor: AppColors.backgroundColor,
+          backgroundColor: AppColors.primaryColor,
+          shape: const CircleBorder(),
+        ),
+        key: _key,
+        distance: 75.0,
         children: [
           FloatingActionButton.extended(
             onPressed: _showConfirmDialogTugas,
             backgroundColor: AppColors.primaryColor,
             label: Text("Upload Tugas", style: TextStyle(color: Colors.white)),
           ),
-          SizedBox(height: 20),
           FloatingActionButton.extended(
             onPressed: _showConfirmDialog,
             backgroundColor: AppColors.primaryColor,
             label: Text("Upload Materi", style: TextStyle(color: Colors.white)),
           ),
-          SizedBox(height: 20),
-          FloatingActionButton(
+          FloatingActionButton.extended(
             onPressed: uploadFile,
             backgroundColor: AppColors.primaryColor,
-            child: Icon(Icons.add, color: Colors.white),
+            label: Text("Upload File", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
