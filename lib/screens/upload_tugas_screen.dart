@@ -607,16 +607,19 @@ class _UploadTugasState extends State<UploadTugas> {
         distance: 75.0,
         children: [
           FloatingActionButton.extended(
+            heroTag: null,
             onPressed: _showConfirmDialogTugas,
             backgroundColor: AppColors.primaryColor,
             label: Text("Upload Tugas", style: TextStyle(color: Colors.white)),
           ),
           FloatingActionButton.extended(
+            heroTag: null,
             onPressed: _showConfirmDialog,
             backgroundColor: AppColors.primaryColor,
             label: Text("Upload Materi", style: TextStyle(color: Colors.white)),
           ),
           FloatingActionButton.extended(
+            heroTag: null,
             onPressed: uploadFile,
             backgroundColor: AppColors.primaryColor,
             label: Text("Upload File", style: TextStyle(color: Colors.white)),

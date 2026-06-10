@@ -23,11 +23,13 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    if (mounted) {
-      context.read<SesiProvider>().getDataSesiByPengampu(
-        widget.pengampu.pengampuId,
-      );
-    }
+    Future.microtask(() {
+      if (mounted) {
+        context.read<SesiProvider>().getDataSesiByPengampu(
+          widget.pengampu.pengampuId,
+        );
+      }
+    });
   }
 
   @override
