@@ -5,6 +5,7 @@ import 'package:pegawai/models/user.dart';
 import 'package:pegawai/providers/user_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -69,10 +70,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     bottom: 14,
                   ),
                   sliver: SliverToBoxAdapter(
-                    child: _profileCard(
-                      userProvider.data!.name,
-                      userProvider.dataPegawai?.nik ?? "joy",
-                      context,
+                    child: Skeletonizer(
+                      enabled: userProvider.isLoading,
+                      child: _profileCard(
+                        userProvider.data!.name,
+                        userProvider.dataPegawai?.nik ?? "joy",
+                        context,
+                      ),
                     ),
                   ),
                 ),
@@ -99,77 +103,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             SizedBox(
                               height: 700,
-                              child: TabBarView(
-                                children: [
-                                  // informasi umum
-                                  _buildTabContent([
-                                    CardInfo(dataPegawai.employeeName, "Nama:"),
-                                    const SizedBox(height: 12),
-                                    const Divider(),
-                                    const SizedBox(height: 12),
-                                    CardInfo(dataPegawai.nik, "NIK:"),
-                                    const Divider(),
-                                    const SizedBox(height: 12),
-                                    CardInfo(dataPegawai.nip, "NIP:"),
-                                    const Divider(),
-                                    const SizedBox(height: 12),
-                                    CardInfo(dataPegawai.gender!, "Gender:"),
-                                    const Divider(),
-                                    const SizedBox(height: 12),
-                                    CardInfo(
-                                      dataPegawai.phoneNumber?.toString() ??
-                                          "Harap diisi",
-                                      "Phone Number:",
-                                    ),
-                                    const Divider(),
-                                    const SizedBox(height: 12),
-                                    CardInfo(
-                                      DateFormat("EEEE, MMMM d, yyyy").format(
-                                        DateTime.parse(
-                                          dataPegawai.birthDate ??
-                                              DateTime.now().toString(),
-                                        ),
+                              child: Skeletonizer(
+                                enabled: userProvider.isLoading,
+                                child: TabBarView(
+                                  children: [
+                                    // informasi umum
+                                    _buildTabContent([
+                                      CardInfo(
+                                        dataPegawai.employeeName,
+                                        "Nama:",
                                       ),
-                                      "Tanggal Lahir:",
-                                    ),
-                                  ]),
-                                  // Informasi akun
-                                  _buildTabContent([
-                                    CardInfo(
-                                      userProvider.data!.email,
-                                      "Email:",
-                                    ),
-                                    const Divider(),
-                                    const SizedBox(height: 12),
-                                    CardInfo(
-                                      userProvider.data!.roleName,
-                                      "Role:",
-                                    ),
-                                    const Divider(),
-                                    const SizedBox(height: 12),
-                                  ]),
-                                  // Domisili
-                                  _buildTabContent([
-                                    CardInfo(
-                                      dataPegawai.city?.name ?? "Harap diisi",
-                                      "Kota:",
-                                    ),
-                                    const Divider(),
-                                    const SizedBox(height: 12),
-                                    CardInfo(
-                                      dataPegawai.province?.name ??
-                                          "Harap diisi",
-                                      "Provinsi:",
-                                    ),
-                                    const Divider(),
-                                    const SizedBox(height: 12),
-                                    CardInfo(
-                                      dataPegawai.province?.name ??
-                                          "Harap diisi",
-                                      "Provinsi:",
-                                    ),
-                                  ]),
-                                ],
+                                      const SizedBox(height: 12),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                      CardInfo(dataPegawai.nik, "NIK:"),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                      CardInfo(dataPegawai.nip, "NIP:"),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                      CardInfo(dataPegawai.gender!, "Gender:"),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                      CardInfo(
+                                        dataPegawai.phoneNumber?.toString() ??
+                                            "Harap diisi",
+                                        "Phone Number:",
+                                      ),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                      CardInfo(
+                                        DateFormat("EEEE, MMMM d, yyyy").format(
+                                          DateTime.parse(
+                                            dataPegawai.birthDate ??
+                                                DateTime.now().toString(),
+                                          ),
+                                        ),
+                                        "Tanggal Lahir:",
+                                      ),
+                                    ]),
+                                    // Informasi akun
+                                    _buildTabContent([
+                                      CardInfo(
+                                        userProvider.data!.email,
+                                        "Email:",
+                                      ),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                      CardInfo(
+                                        userProvider.data!.roleName,
+                                        "Role:",
+                                      ),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                    ]),
+                                    // Domisili
+                                    _buildTabContent([
+                                      CardInfo(
+                                        dataPegawai.city?.name ?? "Harap diisi",
+                                        "Kota:",
+                                      ),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                      CardInfo(
+                                        dataPegawai.province?.name ??
+                                            "Harap diisi",
+                                        "Provinsi:",
+                                      ),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                      CardInfo(
+                                        dataPegawai.province?.name ??
+                                            "Harap diisi",
+                                        "Provinsi:",
+                                      ),
+                                    ]),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
