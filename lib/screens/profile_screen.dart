@@ -25,26 +25,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  void doLogout() async {
+    final provider = context.read<UserProvider>();
+    bool isSuccess = await provider.logout();
+
+    if (!mounted) return;
+
+    if (isSuccess) {
+      Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Samting Wong")));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = context.watch<UserProvider>();
     final UserResponse? user = userProvider.data;
     final dataPegawai = userProvider.dataPegawai;
-
-    void doLogout() async {
-      final provider = context.read<UserProvider>();
-      bool isSuccess = await provider.logout();
-
-      if (!mounted) return;
-
-      if (isSuccess) {
-        Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Samting Wong")));
-      }
-    }
 
     return Scaffold(
       body: userProvider.isLoading || user == null || dataPegawai == null
