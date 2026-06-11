@@ -4,6 +4,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:pegawai/models/user.dart';
 import 'package:pegawai/services/auth_service.dart';
 import 'package:pegawai/utils/token_manager.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class ApiClient {
   ApiClient._internal();
@@ -72,6 +73,17 @@ class ApiClient {
           }
           return handler.next(e);
         },
+      ),
+    );
+
+    dioInstance.interceptors.add(
+      PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+        responseBody: true,
+        responseHeader: false,
+        error: true,
+        compact: true,
       ),
     );
 
