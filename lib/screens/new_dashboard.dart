@@ -459,7 +459,9 @@ class _NewDashboardState extends State<NewDashboard> {
                             itemCount: sesiProvider.data!.length,
                             itemBuilder: (context, index) {
                               final sesi = sesiProvider.data![index];
-                              final bool isOpened = sesi.status == "opened";
+                              final bool isOpened =
+                                  sesi.status == "opened" ||
+                                  sesi.isAlreadyOpened == 1;
 
                               return Padding(
                                 padding: const EdgeInsets.symmetric(

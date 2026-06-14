@@ -66,10 +66,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
   void _prosesTutupSesi(String id, String topic) async {
     final sesiProvider = context.read<SesiProvider>();
     final rootNavigator = Navigator.of(context);
-
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-
-    // UpdateSesiRequest updateSesiRequest = UpdateSesiRequest(status: "closed");
 
     UpdateSesiRequest updateSesiRequest = UpdateSesiRequest(
       status: "closed",
@@ -79,7 +76,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
     final isSuccess = await sesiProvider.updateSesi(updateSesiRequest, id);
 
     if (isSuccess == true) {
-      rootNavigator.pop();
+      rootNavigator.pop(true);
 
       scaffoldMessenger.showSnackBar(
         const SnackBar(
@@ -333,8 +330,8 @@ class _DaftarMahasiswaTabState extends State<DaftarMahasiswaTab> {
   Widget build(BuildContext context) {
     final presensiProvider = context.read<PresensiProvider>();
     final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
-    // PresensiProvider presensiProvider = context.watch<PresensiProvider>();
-    // final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
+
+    final bool isSessionOpen = widget.sesi.status == "opened";
 
     if (dataPresensiMahasiswa != null && !_isMapInitialized) {
       for (var mhs in dataPresensiMahasiswa.mahasiswa) {
@@ -357,18 +354,34 @@ class _DaftarMahasiswaTabState extends State<DaftarMahasiswaTab> {
             width: 105,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.primaryColor,
+              color: isSessionOpen ? AppColors.primaryColor : Colors.grey,
               borderRadius: BorderRadius.circular(8),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: selectedStatus,
                 isExpanded: true,
+                onChanged: isSessionOpen
+                    ? (newValue) {
+                        setState(() {
+                          selectedStatus = newValue!;
+                          if (selectedStatus != "Status") {
+                            _tempPresensiMap.updateAll(
+                              (key, value) => selectedStatus,
+                            );
+                          }
+                        });
+                      }
+                    : null,
                 icon: const Icon(
                   Icons.keyboard_arrow_down,
                   color: Colors.white,
                 ),
                 dropdownColor: AppColors.primaryColor,
+                disabledHint: Text(
+                  selectedStatus,
+                  style: const TextStyle(color: Colors.white60),
+                ),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -380,11 +393,6 @@ class _DaftarMahasiswaTabState extends State<DaftarMahasiswaTab> {
                     child: Text(value),
                   );
                 }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedStatus = newValue!;
-                  });
-                },
               ),
             ),
           ),
@@ -400,75 +408,83 @@ class _DaftarMahasiswaTabState extends State<DaftarMahasiswaTab> {
             itemBuilder: (context, index) {
               final mhs = dataPresensiMahasiswa.mahasiswa[index];
 
-              return PresensiMahasiswa(
-                name: mhs.name,
-                detailId: mhs.detailId,
-                sesiId: dataPresensiMahasiswa.sesiId,
-                currentStatus: _tempPresensiMap[mhs.detailId] ?? "",
-                onStatusChanged: (newStatus) {
-                  setState(() {
-                    _tempPresensiMap[mhs.detailId] = newStatus;
-                  });
-                },
+              return IgnorePointer(
+                ignoring: !isSessionOpen,
+                child: Opacity(
+                  opacity: isSessionOpen ? 1.0 : 0.8,
+                  child: PresensiMahasiswa(
+                    name: mhs.name,
+                    detailId: mhs.detailId,
+                    sesiId: dataPresensiMahasiswa.sesiId,
+                    currentStatus: _tempPresensiMap[mhs.detailId] ?? "",
+                    onStatusChanged: (newStatus) {
+                      setState(() {
+                        _tempPresensiMap[mhs.detailId] = newStatus;
+                      });
+                    },
+                  ),
+                ),
               );
             },
           ),
         ),
         const SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            onPressed: () async {
-              List<DetailUpdatePresensiMahassiwa> listDetail = [];
-              _tempPresensiMap.forEach((id, status) {
-                if (status.isNotEmpty) {
-                  listDetail.add(
-                    DetailUpdatePresensiMahassiwa(
-                      detailId: id,
-                      status: status.toLowerCase(),
+        if (isSessionOpen)
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: () async {
+                List<DetailUpdatePresensiMahassiwa> listDetail = [];
+                _tempPresensiMap.forEach((id, status) {
+                  if (status.isNotEmpty && status != "Status") {
+                    listDetail.add(
+                      DetailUpdatePresensiMahassiwa(
+                        detailId: id,
+                        status: status.toLowerCase(),
+                      ),
+                    );
+                  }
+                });
+
+                final payload = UpdatePresensiMahasiswa(
+                  sesiId: dataPresensiMahasiswa.sesiId,
+                  detail: listDetail,
+                );
+
+                bool sukses = await context
+                    .read<PresensiProvider>()
+                    .updatePresensiMahasiswa(payload);
+
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      sukses
+                          ? "Semua data presensi berhasil diperbarui!"
+                          : "Gagal menyimpan presensi",
                     ),
-                  );
-                }
-              });
-
-              final payload = UpdatePresensiMahasiswa(
-                sesiId: dataPresensiMahasiswa.sesiId,
-                detail: listDetail,
-              );
-
-              bool sukses = await context
-                  .read<PresensiProvider>()
-                  .updatePresensiMahasiswa(payload);
-
-              if (!mounted) return;
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    sukses
-                        ? "Semua data presensi berhasil diperbarui!"
-                        : "Gagal menyimpan presensi",
+                    backgroundColor: sukses ? Colors.green : Colors.red,
                   ),
-                  backgroundColor: sukses ? Colors.green : Colors.red,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
               ),
-            ),
-            child: const Text(
-              "Simpan",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+              child: const Text(
+                "Simpan",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
-        ),
         const SizedBox(height: 50),
       ],
     );
