@@ -1,51 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:pegawai/providers/materi_provider.dart';
-import 'package:pegawai/providers/pegawai_provider.dart';
-import 'package:pegawai/providers/pengampu_provider.dart';
-import 'package:pegawai/providers/presensi_provider.dart';
-import 'package:pegawai/providers/sesi_provider.dart';
-import 'package:pegawai/providers/tugas_provider.dart';
-import 'package:pegawai/providers/user_provider.dart';
-import 'package:pegawai/providers/wilayah_provider.dart';
-import 'package:pegawai/screens/kalender_screen.dart';
-import 'package:pegawai/screens/login_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:pegawai/screens/main_screen.dart';
-import 'package:pegawai/screens/new_dashboard.dart';
-import 'package:pegawai/screens/update_profile_screen.dart';
-import 'package:pegawai/screens/upload_tugas_screen.dart';
-import 'package:pegawai/utils/token_manager.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:pegawai_bloc/core/di/di.dart';
+import 'package:pegawai_bloc/core/utils/token_manager.dart';
+import 'package:pegawai_bloc/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:pegawai_bloc/features/auth/presentation/screen/login_screen.dart';
+import 'package:pegawai_bloc/features/dashboard/presentation/screen/main_screen.dart';
 
 void main() async {
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('id_ID', null);
   String? token = await TokenManager.getAccessToken();
   Widget screen = LoginScreen();
 
   if (token != null && !JwtDecoder.isExpired(token)) {
     screen = MainScreen();
   }
+  setup();
+  runApp(MainApp(screen: screen));
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => SesiProvider()),
-        ChangeNotifierProvider(create: (_) => PresensiProvider()),
-        ChangeNotifierProvider(create: (_) => PengampuProvider()),
-        ChangeNotifierProvider(create: (_) => TugasProvider()),
-        ChangeNotifierProvider(create: (_) => MateriProvider()),
-        ChangeNotifierProvider(create: (_) => WilayahProvider()),
-        ChangeNotifierProvider(create: (_) => PegawaiProvider()),
-      ],
-      child: MainApp(screen: screen),
-    ),
-  );
+  runApp(MainApp(screen: screen));
 }
 
 class MainApp extends StatelessWidget {
@@ -55,19 +30,19 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthCubit>(
+          create: (BuildContext context) => AuthCubit(getIt()),
+        ),
+      ],
+      child: MaterialApp(
+        home: screen,
+        routes: {
+          "login": (context) => LoginScreen(),
+          "dashboard": (context) => MainScreen(),
+        },
       ),
-      home: Scaffold(body: screen),
-      routes: {
-        "/login": (context) => LoginScreen(),
-        "/dashboard": (context) => NewDashboard(),
-        "/kalender": (context) => KalenderScreen(),
-        "/main-screen": (context) => MainScreen(),
-        "/upload-tugas": (context) => UploadTugas(),
-        "/update-profile": (context) => UpdateProfileScreen(),
-      },
     );
   }
 }
