@@ -20,6 +20,24 @@ class NewDashboard extends StatefulWidget {
 class _NewDashboardState extends State<NewDashboard> {
   DateTime _focusedDay = DateTime.now();
 
+  final List<String> _listStatusPresensi = ["Hadir", "Sakit", "Alpha"];
+  String? _selectedStatusPresensi;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedStatusPresensi = _listStatusPresensi[0];
+
+    Future.microtask(() {
+      if (mounted) {
+        context.read<UserProvider>().profile();
+        context.read<PresensiProvider>().getDataPresensiPegawai();
+        _getDataSesi(_focusedDay);
+        context.read<PresensiProvider>().getPresensiHariIni();
+      }
+    });
+  }
+
   String _formatDate(DateTime date) {
     String year = date.year.toString();
     String month = date.month.toString().padLeft(2, '0');
@@ -27,21 +45,8 @@ class _NewDashboardState extends State<NewDashboard> {
     return "$year-$month-$day";
   }
 
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      if (mounted) {
-        context.read<UserProvider>().profile();
-        context.read<PresensiProvider>().getDataPresensiPegawai();
-        _getDataSesi(_focusedDay);
-      }
-    });
-  }
-
   void _getDataSesi(DateTime date) {
     final startDate = DateTime(date.year, date.month, 1);
-
     final endDate = DateTime(date.year, date.month + 1, 0);
 
     context.read<SesiProvider>().getDataSesi(
@@ -52,19 +57,44 @@ class _NewDashboardState extends State<NewDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final UserProvider userProvider = context.watch<UserProvider>();
+    final userProvider = context.watch<UserProvider>();
     final UserResponse? user = userProvider.data;
-    final SesiProvider sesiProvider = context.watch<SesiProvider>();
-    final PresensiProvider presensiProvider = context.watch<PresensiProvider>();
-    final PresensiPegawaiResponse? dataPresensi = presensiProvider.data;
-
-    List<String> listStatusPresensi = ["Hadir", "Sakit", "Alpha"];
-    String? selectedStatusPresensi;
+    final sesiProvider = context.watch<SesiProvider>();
+    final presensiProvider = context.watch<PresensiProvider>();
+    final dataPresensi = presensiProvider.presensiHariIni;
 
     void doCreatePresensi() async {
-      bool isSuccess = await presensiProvider.createPresensi();
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Data pengguna gagal dimuat.")),
+        );
+        return;
+      }
+
+      if (user.detailId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("ID Pegawai tidak ditemukan.")),
+        );
+        return;
+      }
+
+      // Memastikan data bertipe String, bukan String?
+      final String statusTerpilih =
+          _selectedStatusPresensi ?? _listStatusPresensi[0];
+
+      // Payload sekarang aman dari error type mismatch
+      DetailUpdatePresensiMahassiwa payload = DetailUpdatePresensiMahassiwa(
+        detailId: user.detailId!,
+        status: statusTerpilih,
+      );
+
+      // Memasukkan parameter payload ke fungsi provider
+      bool isSuccess = await presensiProvider.updatePresensiPegawai(payload);
+
+      if (!mounted) return;
 
       if (isSuccess) {
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Presensi berhasil dilakukan")),
         );
@@ -84,7 +114,7 @@ class _NewDashboardState extends State<NewDashboard> {
               return Dialog(
                 backgroundColor: AppColors.backgroundColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusGeometry.circular(12),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
@@ -102,33 +132,33 @@ class _NewDashboardState extends State<NewDashboard> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 11),
-                      Text(
+                      const SizedBox(height: 11),
+                      const Text(
                         "Status Kehadiran",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 11),
-                      DropdownButtonFormField(
-                        initialValue: listStatusPresensi[0],
-                        decoration: InputDecoration(
+                      const SizedBox(height: 11),
+                      DropdownButtonFormField<String>(
+                        value: _selectedStatusPresensi,
+                        decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                         ),
-                        items: listStatusPresensi.map((item) {
-                          return DropdownMenuItem(
+                        items: _listStatusPresensi.map((item) {
+                          return DropdownMenuItem<String>(
                             value: item,
                             child: Text(item),
                           );
                         }).toList(),
                         onChanged: (value) {
                           setStateDialog(() {
-                            selectedStatusPresensi = value;
+                            _selectedStatusPresensi = value;
                           });
                         },
                       ),
-                      SizedBox(height: 11),
+                      const SizedBox(height: 11),
                       SizedBox(
                         width: double.infinity,
                         height: 48,
@@ -143,7 +173,7 @@ class _NewDashboardState extends State<NewDashboard> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                           ),
-                          child: Text("Presensi"),
+                          child: const Text("Presensi"),
                         ),
                       ),
                     ],
@@ -158,11 +188,11 @@ class _NewDashboardState extends State<NewDashboard> {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(left: 12, right: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: CustomScrollView(
           slivers: [
             SliverPadding(
-              padding: EdgeInsetsGeometry.only(top: 28, left: 12, right: 12),
+              padding: const EdgeInsets.only(top: 28, left: 12, right: 12),
               sliver: SliverToBoxAdapter(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -172,7 +202,7 @@ class _NewDashboardState extends State<NewDashboard> {
                       children: [
                         Text(
                           "Selamat Datang, ${user?.name ?? "Joy"}",
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                           ),
@@ -208,48 +238,52 @@ class _NewDashboardState extends State<NewDashboard> {
               ),
             ),
             SliverPadding(
-              padding: EdgeInsetsGeometry.only(top: 15),
+              padding: const EdgeInsets.only(top: 15),
               sliver: SliverSkeletonizer(
                 enabled: presensiProvider.isLoading,
                 child: SliverToBoxAdapter(
-                  child: InkWell(
-                    onTap: dataPresensi == null ? _openPresensiDialog : () {},
-                    child: Container(
-                      width: double.infinity,
-                      height: 86,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: Colors.white,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            Icon(
-                              dataPresensi != null
-                                  ? Icons.verified
-                                  : Icons.close,
-                              color: dataPresensi != null
-                                  ? Colors.green
-                                  : Colors.redAccent,
-                              size: 64,
+                  child: dataPresensi == null
+                      ? const SizedBox.shrink()
+                      : InkWell(
+                          onTap: dataPresensi.status == "alpha"
+                              ? _openPresensiDialog
+                              : () {},
+                          child: Container(
+                            width: double.infinity,
+                            height: 86,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.white,
                             ),
-                            SizedBox(width: 10),
-                            Text(
-                              dataPresensi != null
-                                  ? "Kamu sudah presensi hari ini"
-                                  : "Kamu belum presensi hari ini",
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    dataPresensi.status != "alpha"
+                                        ? Icons.verified
+                                        : Icons.close,
+                                    color: dataPresensi.status != "alpha"
+                                        ? Colors.green
+                                        : Colors.redAccent,
+                                    size: 64,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    dataPresensi.status != "alpha"
+                                        ? "Kamu sudah presensi hari ini"
+                                        : "Kamu belum presensi hari ini",
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ),
             SliverPadding(
-              padding: EdgeInsetsGeometry.only(top: 15),
+              padding: const EdgeInsets.only(top: 15),
               sliver: SliverSkeletonizer(
                 enabled: sesiProvider.isLoading,
                 child: SliverToBoxAdapter(
@@ -292,7 +326,6 @@ class _NewDashboardState extends State<NewDashboard> {
                           ),
                         ),
                         const SizedBox(height: 20),
-
                         if (sesiProvider.data != null &&
                             sesiProvider.data!.isNotEmpty)
                           ListView.separated(

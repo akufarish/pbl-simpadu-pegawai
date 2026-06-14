@@ -11,6 +11,9 @@ class PresensiProvider with ChangeNotifier {
   PresensiResponse? _presensiMahasiswa;
   PresensiResponse? get presensiMahasiswa => _presensiMahasiswa;
 
+  PresensiHariIni? _presensiHariIni;
+  PresensiHariIni? get presensiHariIni => _presensiHariIni;
+
   Future<String?> createPresensiMahasiswa(PresensiRequest payload) async {
     try {
       String? isSuccess = await presensiService.createPresensiMahasiswa(
@@ -91,6 +94,33 @@ class PresensiProvider with ChangeNotifier {
       isLoading = false;
       notifyListeners();
       return true;
+    } catch (e) {
+      debugPrint("$e");
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<void> getPresensiHariIni() async {
+    isLoading = true;
+    notifyListeners();
+    _presensiHariIni = await presensiService.getPresensiHariIni();
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<bool> updatePresensiPegawai(
+    DetailUpdatePresensiMahassiwa payload,
+  ) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      final status = await presensiService.updatePresensiPegawai(payload);
+      isLoading = false;
+      notifyListeners();
+      await getPresensiHariIni();
+      return status;
     } catch (e) {
       debugPrint("$e");
       isLoading = false;

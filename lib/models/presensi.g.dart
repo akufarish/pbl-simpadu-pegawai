@@ -61,6 +61,18 @@ Map<String, dynamic> _$PresensiPegawaiResponseToJson(
   PresensiPegawaiResponse instance,
 ) => <String, dynamic>{'pegawai': instance.pegawai, 'sesi_id': instance.sesiId};
 
+PresensiHariIni _$PresensiHariIniFromJson(Map<String, dynamic> json) =>
+    PresensiHariIni(
+      createdAt: json['created_at'] as String,
+      status: json['status'] as String,
+    );
+
+Map<String, dynamic> _$PresensiHariIniToJson(PresensiHariIni instance) =>
+    <String, dynamic>{
+      'created_at': instance.createdAt,
+      'status': instance.status,
+    };
+
 UpdatePresensiMahasiswa _$UpdatePresensiMahasiswaFromJson(
   Map<String, dynamic> json,
 ) => UpdatePresensiMahasiswa(

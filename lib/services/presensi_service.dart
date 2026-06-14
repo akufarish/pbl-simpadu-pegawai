@@ -143,30 +143,52 @@ class PresensiService {
     }
   }
 
-  // Future<void> updatePresensi(UpdatePresensiMahasiswa payload) async {
-  //   final Map<String, dynamic> data = {
-  //     "sesi_id": payload.sesiId,
-  //     "detail": [
-  //       {"detail_id": payload.detailId, "status": payload.status.toLowerCase()},
-  //     ],
-  //   };
+  Future<PresensiHariIni> getPresensiHariIni() async {
+    try {
+      final response = await ApiClient().dio.get(
+        "$kelompok1Url/api/presensi/pegawai/me",
+      );
+      final result = ApiResponse<PresensiHariIni>.fromJson(
+        response.data,
+        (json) => PresensiHariIni.fromJson(json as Map<String, dynamic>),
+      );
+      return result.data!;
+    } catch (e) {
+      throw Exception("Network Error: $e");
+    }
+  }
 
-  //   try {
-  //     final response = await ApiClient().dio.put(
-  //       "$kelompok1Url/api/presensi/mahasiswa",
-  //       data: data,
-  //     );
+  Future<bool> updatePresensiPegawai(
+    DetailUpdatePresensiMahassiwa payload,
+  ) async {
+    final Map<String, dynamic> data = {
+      "date": DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      "detail": [
+        {"detail_id": payload.detailId, "status": payload.status.toLowerCase()},
+      ],
+    };
 
-  //     debugPrint("Sukses simpan presensi: ${response.statusCode}");
-  //   } on DioException catch (e) {
-  //     debugPrint(
-  //       "Gagal simpan presensi (${e.response?.statusCode}): ${e.response?.data}",
-  //     );
-  //     throw Exception(
-  //       "Gagal menyimpan presensi: ${e.response?.data ?? e.message}",
-  //     );
-  //   } catch (e) {
-  //     throw Exception("Network Error: $e");
-  //   }
-  // }
+    try {
+      final response = await ApiClient().dio.put(
+        "$kelompok1Url/api/presensi/pegawai",
+        data: data,
+      );
+
+      debugPrint("Sukses simpan presensi: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } on DioException catch (e) {
+      debugPrint(
+        "Gagal simpan presensi (${e.response?.statusCode}): ${e.response?.data}",
+      );
+      throw Exception(
+        "Gagal menyimpan presensi: ${e.response?.data ?? e.message}",
+      );
+    } catch (e) {
+      throw Exception("Network Error: $e");
+    }
+  }
 }

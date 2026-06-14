@@ -42,21 +42,27 @@ class _SesiCardState extends State<SesiCard> {
     );
 
     if (updateSesi == true) {
-      final result = await provider.createPresensiMahasiswa(presensiRequest);
+      // final result = await provider.createPresensiMahasiswa(presensiRequest);
 
-      if (result == null) {
-        debugPrint("Navigasi ke detail-sesi...");
+      Future.delayed(Duration.zero, () {
+        navigator.push(
+          MaterialPageRoute(builder: (context) => DetailSesiScreen(sesi: sesi)),
+        );
+      });
 
-        navigator.pop();
+      // if (result == null) {
+      //   debugPrint("Navigasi ke detail-sesi...");
 
-        Future.delayed(Duration.zero, () {
-          navigator.push(
-            MaterialPageRoute(
-              builder: (context) => DetailSesiScreen(sesi: sesi),
-            ),
-          );
-        });
-      }
+      //   navigator.pop();
+
+      //   Future.delayed(Duration.zero, () {
+      //     navigator.push(
+      //       MaterialPageRoute(
+      //         builder: (context) => DetailSesiScreen(sesi: sesi),
+      //       ),
+      //     );
+      //   });
+      // }
     } else {
       debugPrint("Gagal update sesi");
     }
@@ -150,7 +156,7 @@ class _SesiCardState extends State<SesiCard> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.dataSesi.courseName,
+                  widget.dataSesi.id,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,

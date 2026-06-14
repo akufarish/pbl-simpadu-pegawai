@@ -26,7 +26,7 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
     Future.microtask(() {
       if (mounted) {
         context.read<SesiProvider>().getDataSesiByPengampu(
-          widget.pengampu.pengampuId,
+          "019eb0e3-ef81-7ade-b1bf-43fcc47ea03f",
         );
       }
     });
