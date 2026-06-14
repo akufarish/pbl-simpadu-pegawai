@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pegawai/components/sesi_card.dart';
 import 'package:pegawai/models/presensi.dart';
+import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/models/user.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/providers/user_provider.dart';
+import 'package:pegawai/screens/detail_sesi_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -19,14 +20,16 @@ class NewDashboard extends StatefulWidget {
 
 class _NewDashboardState extends State<NewDashboard> {
   DateTime _focusedDay = DateTime.now();
-
   final List<String> _listStatusPresensi = ["Hadir", "Sakit", "Alpha"];
   String? _selectedStatusPresensi;
+
+  late TextEditingController _topicController;
 
   @override
   void initState() {
     super.initState();
     _selectedStatusPresensi = _listStatusPresensi[0];
+    _topicController = TextEditingController();
 
     Future.microtask(() {
       if (mounted) {
@@ -36,6 +39,12 @@ class _NewDashboardState extends State<NewDashboard> {
         context.read<PresensiProvider>().getPresensiHariIni();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _topicController.dispose();
+    super.dispose();
   }
 
   String _formatDate(DateTime date) {
@@ -55,6 +64,129 @@ class _NewDashboardState extends State<NewDashboard> {
     );
   }
 
+  void _prosesBukaSesi({
+    required BuildContext dialogContext,
+    required Sesi sesi,
+    required String topic,
+  }) async {
+    final dialogNavigator = Navigator.of(dialogContext);
+    final rootNavigator = Navigator.of(context);
+    final sesiProvider = context.read<SesiProvider>();
+    final presensiProvider = context.read<PresensiProvider>();
+
+    UpdateSesiRequest updateSesiRequest = UpdateSesiRequest(
+      status: "opened",
+      topic: topic,
+    );
+
+    final isSuccess = await sesiProvider.updateSesi(updateSesiRequest, sesi.id);
+
+    PresensiRequest presensiRequest = PresensiRequest(
+      pengampuId: sesi.pengampuId,
+      sesiId: sesi.id,
+    );
+
+    if (isSuccess == true) {
+      final result = await presensiProvider.createPresensiMahasiswa(
+        presensiRequest,
+      );
+
+      if (result == null) {
+        dialogNavigator.pop();
+
+        if (mounted) {
+          _topicController.clear();
+        }
+
+        rootNavigator.push(
+          MaterialPageRoute(builder: (context) => DetailSesiScreen(sesi: sesi)),
+        );
+      }
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Gagal memperbarui status sesi.")),
+      );
+    }
+  }
+
+  void _tampilkanDialogBukaSesi(Sesi dataSesi) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  dataSesi.courseName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Sesi ${dataSesi.sessionNumber}",
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  "Topik Kelas",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _topicController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                    hintText: "Masukkan topik kelas...",
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _prosesBukaSesi(
+                        dialogContext: dialogContext,
+                        sesi: dataSesi,
+                        topic: _topicController.text.trim(),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: const Text(
+                      "Buka Sesi",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
@@ -64,31 +196,20 @@ class _NewDashboardState extends State<NewDashboard> {
     final dataPresensi = presensiProvider.presensiHariIni;
 
     void doCreatePresensi() async {
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Data pengguna gagal dimuat.")),
-        );
-        return;
-      }
-
-      if (user.detailId == null) {
+      if (user?.detailId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("ID Pegawai tidak ditemukan.")),
         );
         return;
       }
 
-      // Memastikan data bertipe String, bukan String?
       final String statusTerpilih =
           _selectedStatusPresensi ?? _listStatusPresensi[0];
-
-      // Payload sekarang aman dari error type mismatch
       DetailUpdatePresensiMahassiwa payload = DetailUpdatePresensiMahassiwa(
-        detailId: user.detailId!,
+        detailId: user!.detailId!,
         status: statusTerpilih,
       );
 
-      // Memasukkan parameter payload ke fungsi provider
       bool isSuccess = await presensiProvider.updatePresensiPegawai(payload);
 
       if (!mounted) return;
@@ -191,6 +312,7 @@ class _NewDashboardState extends State<NewDashboard> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: CustomScrollView(
           slivers: [
+            // Header Section
             SliverPadding(
               padding: const EdgeInsets.only(top: 28, left: 12, right: 12),
               sliver: SliverToBoxAdapter(
@@ -237,6 +359,7 @@ class _NewDashboardState extends State<NewDashboard> {
                 ),
               ),
             ),
+
             SliverPadding(
               padding: const EdgeInsets.only(top: 15),
               sliver: SliverSkeletonizer(
@@ -282,6 +405,7 @@ class _NewDashboardState extends State<NewDashboard> {
                 ),
               ),
             ),
+
             SliverPadding(
               padding: const EdgeInsets.only(top: 15),
               sliver: SliverSkeletonizer(
@@ -335,20 +459,106 @@ class _NewDashboardState extends State<NewDashboard> {
                             itemCount: sesiProvider.data!.length,
                             itemBuilder: (context, index) {
                               final sesi = sesiProvider.data![index];
+                              final bool isOpened = sesi.status == "opened";
+
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                 ),
-                                child: SesiCard(dataSesi: sesi),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              sesi.courseName,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            if (sesi.status == "opened")
+                                              const Text(
+                                                "Sesi sedang berjalan",
+                                                style: TextStyle(
+                                                  color: Colors.green,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            const SizedBox(height: 8),
+                                            _inlineInfoRow(
+                                              Icons.access_time_filled_rounded,
+                                              sesi.sessionDate,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            _inlineInfoRow(
+                                              Icons.person,
+                                              sesi.lecturer.employeeName,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            _inlineInfoRow(
+                                              Icons.book,
+                                              sesi.className,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () async {
+                                          if (isOpened) {
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    DetailSesiScreen(
+                                                      sesi: sesi,
+                                                    ),
+                                              ),
+                                            );
+
+                                            _getDataSesi(_focusedDay);
+                                          } else {
+                                            _tampilkanDialogBukaSesi(sesi);
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              AppColors.primaryColor,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 8,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          elevation: 0,
+                                        ),
+                                        child: Text(
+                                          isOpened
+                                              ? "Detail Sesi"
+                                              : "Buka Sesi",
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               );
                             },
-                            separatorBuilder:
-                                (BuildContext context, int index) {
-                                  return const Divider(
-                                    height: 32,
-                                    thickness: 1,
-                                  );
-                                },
+                            separatorBuilder: (context, index) =>
+                                const Divider(height: 32, thickness: 1),
                           )
                         else
                           const Padding(
@@ -366,6 +576,25 @@ class _NewDashboardState extends State<NewDashboard> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _inlineInfoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.grey[500], size: 18),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

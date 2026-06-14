@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/models/sesi.dart';
-import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/screens/detail_sesi_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
@@ -16,24 +14,30 @@ class SesiCard extends StatefulWidget {
 }
 
 class _SesiCardState extends State<SesiCard> {
-  final _topicController = TextEditingController();
+  late TextEditingController _topicController;
 
-  void doUpdateSesi(Sesi sesi) async {
-    final topic = _topicController.text;
+  @override
+  void initState() {
+    super.initState();
+    _topicController = TextEditingController();
+  }
 
-    final navigator = Navigator.of(context);
+  @override
+  void dispose() {
+    super.dispose();
+    _topicController.dispose();
+  }
 
-    PresensiRequest presensiRequest = PresensiRequest(
-      pengampuId: "019e5a44-d9ff-744d-b4b0-ad809bd00ada",
-      sesiId: sesi.id,
-    );
+  void doUpdateSesi(BuildContext dialogContext, Sesi sesi, String topic) async {
+    final dialogNavigator = Navigator.of(dialogContext);
+    final rootNavigator = Navigator.of(context);
 
-    final provider = context.read<PresensiProvider>();
     final sesiProvider = context.read<SesiProvider>();
 
     UpdateSesiRequest updateSesiRequest = UpdateSesiRequest(
       status: "opened",
       topic: topic,
+      isAlreadyOpened: 1,
     );
 
     final updateSesi = await sesiProvider.updateSesi(
@@ -41,28 +45,22 @@ class _SesiCardState extends State<SesiCard> {
       sesi.id,
     );
 
+    debugPrint("update sesi: $updateSesi");
+
     if (updateSesi == true) {
-      // final result = await provider.createPresensiMahasiswa(presensiRequest);
+      debugPrint("Update sesi sukses. Menutup dialog...");
 
-      Future.delayed(Duration.zero, () {
-        navigator.push(
-          MaterialPageRoute(builder: (context) => DetailSesiScreen(sesi: sesi)),
-        );
-      });
+      dialogNavigator.pop();
 
-      // if (result == null) {
-      //   debugPrint("Navigasi ke detail-sesi...");
+      debugPrint("Navigasi ke detail-sesi...");
 
-      //   navigator.pop();
+      if (mounted) {
+        _topicController.clear();
+      }
 
-      //   Future.delayed(Duration.zero, () {
-      //     navigator.push(
-      //       MaterialPageRoute(
-      //         builder: (context) => DetailSesiScreen(sesi: sesi),
-      //       ),
-      //     );
-      //   });
-      // }
+      rootNavigator.push(
+        MaterialPageRoute(builder: (context) => DetailSesiScreen(sesi: sesi)),
+      );
     } else {
       debugPrint("Gagal update sesi");
     }
@@ -71,7 +69,8 @@ class _SesiCardState extends State<SesiCard> {
   void _bukaSesi(Sesi dataSesi) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
         return Dialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
@@ -115,7 +114,11 @@ class _SesiCardState extends State<SesiCard> {
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () => doUpdateSesi(dataSesi),
+                    onPressed: () => doUpdateSesi(
+                      dialogContext,
+                      dataSesi,
+                      _topicController.text,
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,
@@ -138,12 +141,6 @@ class _SesiCardState extends State<SesiCard> {
   }
 
   @override
-  void dispose() {
-    _topicController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -156,7 +153,7 @@ class _SesiCardState extends State<SesiCard> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.dataSesi.id,
+                  "Sesi ke ${widget.dataSesi.sessionNumber} | ${widget.dataSesi.topic ?? "kosong"}",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -164,10 +161,6 @@ class _SesiCardState extends State<SesiCard> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // _buildInfoRow(
-                //   Icons.access_time_filled_rounded,
-                //   "${widget.dataSesi.startTime} - ${widget.dataSesi.endTime} WITA",
-                // ),
                 _buildInfoRow(
                   Icons.access_time_filled_rounded,
                   widget.dataSesi.sessionDate,
@@ -182,49 +175,26 @@ class _SesiCardState extends State<SesiCard> {
               ],
             ),
           ),
-          if (widget.dataSesi.isAlreadyOpened != 1)
-            ElevatedButton(
-              onPressed: () => _bukaSesi(widget.dataSesi),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailSesiScreen(sesi: widget.dataSesi),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 0,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text("Buka Sesi"),
-            )
-          else
-            ElevatedButton(
-              onPressed: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        DetailSesiScreen(sesi: widget.dataSesi),
-                  ),
-                ),
-                // Navigator.pushNamed(context, "/upload-tugas"),
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 0,
-              ),
-              child: const Text("Detail Sesi"),
+              elevation: 0,
             ),
+            child: const Text("Detail Sesi"),
+          ),
         ],
       ),
     );

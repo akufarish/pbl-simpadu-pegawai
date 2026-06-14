@@ -4,6 +4,7 @@ import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/providers/materi_provider.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
+import 'package:pegawai/providers/sesi_provider.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -62,6 +63,37 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
     }
   }
 
+  void _prosesTutupSesi(String id, String topic) async {
+    final sesiProvider = context.read<SesiProvider>();
+    final rootNavigator = Navigator.of(context);
+
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    // UpdateSesiRequest updateSesiRequest = UpdateSesiRequest(status: "closed");
+
+    UpdateSesiRequest updateSesiRequest = UpdateSesiRequest(
+      status: "closed",
+      topic: topic,
+    );
+
+    final isSuccess = await sesiProvider.updateSesi(updateSesiRequest, id);
+
+    if (isSuccess == true) {
+      rootNavigator.pop();
+
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text("Sesi berhasil ditutup"),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text("Gagal menutup sesi, coba lagi.")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     debugPrint("Id Sesi: ${widget.sesi.id}");
@@ -83,14 +115,50 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      widget.sesi.courseName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.sesi.courseName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                        if (widget.sesi.status == "opened")
+                          SizedBox(
+                            width: 150,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () => _prosesTutupSesi(
+                                widget.sesi.id,
+                                widget.sesi.topic ?? "topic",
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                backgroundColor: AppColors.primaryColor,
+                              ),
+                              child: const Text(
+                                "Tutup Sesi",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
+                    if (widget.sesi.status == "opened")
+                      const Text(
+                        "Sesi sedang berjalan",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     const SizedBox(height: 8),
                     _buildInfoRow(
                       Icons.access_time_filled_rounded,
@@ -102,7 +170,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                       widget.sesi.lecturer.employeeName,
                     ),
                     const SizedBox(height: 4),
-                    _buildInfoRow(Icons.book, "Sesi ${widget.sesi.id}"),
+                    _buildInfoRow(Icons.book, "Sesi ${widget.sesi.topic}"),
                   ],
                 ),
               ),
@@ -246,9 +314,27 @@ class _DaftarMahasiswaTabState extends State<DaftarMahasiswaTab> {
   bool _isMapInitialized = false;
 
   @override
-  Widget build(BuildContext context) {
-    PresensiProvider presensiProvider = context.watch<PresensiProvider>();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final presensiProvider = context.watch<PresensiProvider>();
     final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
+
+    if (dataPresensiMahasiswa != null && !_isMapInitialized) {
+      _tempPresensiMap.clear();
+      for (var mhs in dataPresensiMahasiswa.mahasiswa) {
+        _tempPresensiMap[mhs.detailId] = mhs.status;
+      }
+      _isMapInitialized = true;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final presensiProvider = context.read<PresensiProvider>();
+    final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
+    // PresensiProvider presensiProvider = context.watch<PresensiProvider>();
+    // final dataPresensiMahasiswa = presensiProvider.presensiMahasiswa;
 
     if (dataPresensiMahasiswa != null && !_isMapInitialized) {
       for (var mhs in dataPresensiMahasiswa.mahasiswa) {

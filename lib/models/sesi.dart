@@ -108,11 +108,13 @@ class LecturerModel {
 @JsonSerializable()
 class UpdateSesiRequest {
   @JsonKey(name: 'topic')
-  final String topic;
+  final String? topic;
   @JsonKey(name: 'status')
   final String status;
+  @JsonKey(name: "is_already_opened")
+  final int? isAlreadyOpened;
 
-  UpdateSesiRequest({required this.status, required this.topic});
+  UpdateSesiRequest({required this.status, this.topic, this.isAlreadyOpened});
 
   factory UpdateSesiRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateSesiRequestFromJson(json);

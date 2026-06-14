@@ -85,8 +85,13 @@ Map<String, dynamic> _$LecturerModelToJson(LecturerModel instance) =>
 UpdateSesiRequest _$UpdateSesiRequestFromJson(Map<String, dynamic> json) =>
     UpdateSesiRequest(
       status: json['status'] as String,
-      topic: json['topic'] as String,
+      topic: json['topic'] as String?,
+      isAlreadyOpened: (json['is_already_opened'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$UpdateSesiRequestToJson(UpdateSesiRequest instance) =>
-    <String, dynamic>{'topic': instance.topic, 'status': instance.status};
+    <String, dynamic>{
+      'topic': instance.topic,
+      'status': instance.status,
+      'is_already_opened': instance.isAlreadyOpened,
+    };
