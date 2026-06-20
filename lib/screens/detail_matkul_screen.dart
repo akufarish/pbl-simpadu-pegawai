@@ -26,7 +26,7 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
     Future.microtask(() {
       if (mounted) {
         context.read<SesiProvider>().getDataSesiByPengampu(
-          "019eb0e3-ef81-7ade-b1bf-43fcc47ea03f",
+          widget.pengampu.pengampuId,
         );
       }
     });
@@ -108,25 +108,28 @@ class _DetailMatkulScreenState extends State<DetailMatkulScreen>
             children: [
               Skeletonizer(
                 enabled: sesiProvider.isLoading,
-                child: ListView.separated(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: sesiProvider.data!.length,
-                  itemBuilder: (context, index) {
-                    final sesi = sesiProvider.data![index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: SesiCard(dataSesi: sesi),
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const Divider(height: 32, thickness: 1);
-                  },
-                ),
+                child:
+                    sesiProvider.data != null && sesiProvider.data!.isNotEmpty
+                    ? ListView.separated(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: sesiProvider.data!.length,
+                        itemBuilder: (context, index) {
+                          final sesi = sesiProvider.data![index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: SesiCard(dataSesi: sesi),
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const Divider(height: 32, thickness: 1);
+                        },
+                      )
+                    : Center(child: Text("Data sesi tidak ditemukan")),
               ),
               const TugasScreen(),
-              const Center(child: Text("Konten Materi")),
+              const TugasScreen(),
             ],
           ),
         ),
