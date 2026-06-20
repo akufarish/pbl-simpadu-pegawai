@@ -23,6 +23,9 @@ Sesi _$SesiFromJson(Map<String, dynamic> json) => Sesi(
   lecturerId: json['lecturer_id'] as String,
   lecturer: LecturerModel.fromJson(json['lecturer'] as Map<String, dynamic>),
   learningMaterials: (json['learning_materials'] as List<dynamic>?)
+      ?.map((e) => Materi.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  assignments: (json['assignments'] as List<dynamic>?)
       ?.map((e) => Tugas.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
@@ -44,6 +47,7 @@ Map<String, dynamic> _$SesiToJson(Sesi instance) => <String, dynamic>{
   'lecturer_id': instance.lecturerId,
   'lecturer': instance.lecturer,
   'learning_materials': instance.learningMaterials,
+  'assignments': instance.assignments,
 };
 
 LecturerModel _$LecturerModelFromJson(Map<String, dynamic> json) =>

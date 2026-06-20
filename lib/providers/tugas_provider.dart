@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:pegawai/models/materi.dart';
 import 'package:pegawai/models/tugas.dart';
 import 'package:pegawai/services/tugas_service.dart';
 
@@ -8,8 +9,8 @@ class TugasProvider with ChangeNotifier {
   bool isLoading = false;
   TugasService tugasService = TugasService();
 
-  late List<Tugas> _data = [];
-  List<Tugas> get data => _data;
+  late List<Materi> _data = [];
+  List<Materi> get data => _data;
 
   Future<void> uploadTugas(List<File> file) async {
     isLoading = true;

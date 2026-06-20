@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pegawai/components/presensi_mahasiswa.dart';
+import 'package:pegawai/components/tugas_card.dart';
 import 'package:pegawai/models/sesi.dart';
 import 'package:pegawai/models/presensi.dart';
 import 'package:pegawai/providers/materi_provider.dart';
 import 'package:pegawai/providers/presensi_provider.dart';
 import 'package:pegawai/providers/sesi_provider.dart';
+import 'package:pegawai/screens/detail_tugas_screen.dart';
 import 'package:pegawai/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -171,7 +173,10 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                       widget.sesi.lecturer.employeeName,
                     ),
                     const SizedBox(height: 4),
-                    _buildInfoRow(Icons.book, "Sesi ${widget.sesi.topic}"),
+                    _buildInfoRow(
+                      Icons.book,
+                      "Sesi ${widget.sesi.sessionNumber} | ${widget.sesi.topic}",
+                    ),
                   ],
                 ),
               ),
@@ -202,71 +207,88 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
             children: [
               DaftarMahasiswaTab(sesi: widget.sesi),
 
-              ListView.separated(
-                padding: const EdgeInsets.only(bottom: 20),
-                itemCount: widget.sesi.learningMaterials!.length,
-                itemBuilder: (context, index) {
-                  final materi = widget.sesi.learningMaterials![index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(child: Text(materi.originaFileName)),
-                        const Spacer(),
-                        ElevatedButton.icon(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                            minimumSize: const Size(50, 50),
-                          ),
-                          label: const Icon(
-                            Icons.download,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+              (widget.sesi.assignments == null ||
+                      widget.sesi.assignments!.isEmpty)
+                  ? const Center(
+                      child: Text(
+                        "Tidak ada tugas pada sesi ini",
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      itemCount: widget.sesi.assignments!.length,
+                      itemBuilder: (context, index) {
+                        final tugas = widget.sesi.assignments![index];
+                        return TugasItemCard(
+                          tugas: tugas,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => DetailTugasScreen(
+                                  tugas: tugas,
+                                  sesi: widget.sesi,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const Divider(height: 32, thickness: 1);
+                      },
                     ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return const Divider(height: 32, thickness: 1);
-                },
-              ),
-              ListView.separated(
-                padding: const EdgeInsets.only(bottom: 20),
-                itemCount: widget.sesi.learningMaterials!.length,
-                itemBuilder: (context, index) {
-                  final materi = widget.sesi.learningMaterials![index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(child: Text(materi.originaFileName)),
-                        const Spacer(),
-                        ElevatedButton.icon(
-                          onPressed: () =>
-                              downloadMateri(materi.id, materi.originaFileName),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                            minimumSize: const Size(50, 50),
+              (widget.sesi.learningMaterials == null ||
+                      widget.sesi.learningMaterials!.isEmpty)
+                  ? const Center(
+                      child: Text(
+                        "Tidak ada materi pada sesi ini",
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      itemCount: widget.sesi.learningMaterials!.length,
+                      itemBuilder: (context, index) {
+                        final materi = widget.sesi.learningMaterials![index];
+
+                        if (widget.sesi.learningMaterials!.isEmpty) {
+                          return Center(
+                            child: Text("Tidak ada materi pada sesi ini"),
+                          );
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(child: Text(materi.originaFileName)),
+                              const Spacer(),
+                              ElevatedButton.icon(
+                                onPressed: () => downloadMateri(
+                                  materi.id,
+                                  materi.originaFileName,
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  minimumSize: const Size(50, 50),
+                                ),
+                                label: const Icon(
+                                  Icons.download,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
-                          label: const Icon(
-                            Icons.download,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const Divider(height: 32, thickness: 1);
+                      },
                     ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return const Divider(height: 32, thickness: 1);
-                },
-              ),
             ],
           ),
         ),

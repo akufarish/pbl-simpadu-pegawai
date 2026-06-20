@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
+import 'package:pegawai/models/materi.dart';
 import 'package:pegawai/models/tugas.dart';
 import 'package:pegawai/providers/materi_provider.dart';
 import 'package:pegawai/providers/pengampu_provider.dart';
@@ -514,7 +515,7 @@ class _UploadTugasState extends State<UploadTugas> {
             ),
             itemCount: tugasProvider.data.length,
             itemBuilder: (context, index) {
-              final Tugas tugas = tugasProvider.data[index];
+              final Materi tugas = tugasProvider.data[index];
 
               return SizedBox(
                 width: 100,

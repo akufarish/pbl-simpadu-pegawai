@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:pegawai/models/materi.dart';
 import 'package:pegawai/models/tugas.dart';
 
 part 'sesi.g.dart';
@@ -32,7 +33,9 @@ class Sesi {
   final String lecturerId;
   final LecturerModel lecturer;
   @JsonKey(name: 'learning_materials')
-  final List<Tugas>? learningMaterials;
+  final List<Materi>? learningMaterials;
+  @JsonKey(name: 'assignments')
+  final List<Tugas>? assignments;
 
   Sesi({
     required this.id,
@@ -51,6 +54,7 @@ class Sesi {
     required this.lecturerId,
     required this.lecturer,
     this.learningMaterials,
+    this.assignments,
   });
 
   factory Sesi.fromJson(Map<String, dynamic> json) => _$SesiFromJson(json);

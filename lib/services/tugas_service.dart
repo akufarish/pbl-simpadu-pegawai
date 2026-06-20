@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:pegawai/models/api_response.dart';
+import 'package:pegawai/models/materi.dart';
 import 'package:pegawai/models/tugas.dart';
 import 'package:pegawai/utils/api_client.dart';
 
@@ -57,17 +58,17 @@ class TugasService {
     }
   }
 
-  Future<List<Tugas>> getTugas() async {
+  Future<List<Materi>> getTugas() async {
     final response = await ApiClient().dio.get(
       "$kelompok2Url/api/file-uploads",
     );
 
     try {
       if (response.statusCode == 200) {
-        final result = ApiResponse<List<Tugas>>.fromJson(
+        final result = ApiResponse<List<Materi>>.fromJson(
           response.data,
           (json) => (json as List)
-              .map((item) => Tugas.fromJson(item as Map<String, dynamic>))
+              .map((item) => Materi.fromJson(item as Map<String, dynamic>))
               .toList(),
         );
         debugPrint("Get tugas sesi: ${result.data}");

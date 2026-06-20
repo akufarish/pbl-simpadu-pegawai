@@ -8,18 +8,22 @@ part of 'tugas.dart';
 
 Tugas _$TugasFromJson(Map<String, dynamic> json) => Tugas(
   id: json['id'] as String,
-  originaFileName: json['original_file_name'] as String,
-  fileSize: (json['file_size'] as num).toInt(),
-  mimeType: json['mime_type'] as String,
-  uploadedAt: json['uploaded_at'] as String,
+  title: json['title'] as String,
+  description: json['description'] as String?,
+  deadline: json['deadline'] as String,
+  createdAt: json['created_at'] as String,
+  attachment: (json['attachment'] as List<dynamic>?)
+      ?.map((e) => Materi.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$TugasToJson(Tugas instance) => <String, dynamic>{
   'id': instance.id,
-  'original_file_name': instance.originaFileName,
-  'file_size': instance.fileSize,
-  'mime_type': instance.mimeType,
-  'uploaded_at': instance.uploadedAt,
+  'title': instance.title,
+  'description': instance.description,
+  'deadline': instance.deadline,
+  'created_at': instance.createdAt,
+  'attachment': instance.attachment,
 };
 
 TugasRequest _$TugasRequestFromJson(Map<String, dynamic> json) =>
