@@ -213,7 +213,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(materi.originaFileName),
+                        Expanded(child: Text(materi.originaFileName)),
                         const Spacer(),
                         ElevatedButton.icon(
                           onPressed: () {},
@@ -245,7 +245,7 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(materi.originaFileName),
+                        Expanded(child: Text(materi.originaFileName)),
                         const Spacer(),
                         ElevatedButton.icon(
                           onPressed: () =>

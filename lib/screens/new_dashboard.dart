@@ -87,27 +87,27 @@ class _NewDashboardState extends State<NewDashboard> {
     );
 
     if (isSuccess != null) {
-      // final result = await presensiProvider.createPresensiMahasiswa(
-      //   presensiRequest,
-      // );
-
-      // if (result == null) {
-      dialogNavigator.pop();
-
-      if (mounted) {
-        _topicController.clear();
-      }
-
-      final refresh = await rootNavigator.push(
-        MaterialPageRoute(
-          builder: (context) => DetailSesiScreen(sesi: isSuccess),
-        ),
+      final result = await presensiProvider.createPresensiMahasiswa(
+        presensiRequest,
       );
 
-      if (refresh == true && mounted) {
-        _getDataSesi(_focusedDay);
+      if (result == null) {
+        dialogNavigator.pop();
+
+        if (mounted) {
+          _topicController.clear();
+        }
+
+        final refresh = await rootNavigator.push(
+          MaterialPageRoute(
+            builder: (context) => DetailSesiScreen(sesi: isSuccess),
+          ),
+        );
+
+        if (refresh == true && mounted) {
+          _getDataSesi(_focusedDay);
+        }
       }
-      // }
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
