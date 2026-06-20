@@ -75,15 +75,17 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
 
     final isSuccess = await sesiProvider.updateSesi(updateSesiRequest, id);
 
-    if (isSuccess == true) {
-      rootNavigator.pop(true);
+    if (isSuccess != null) {
+      if (isSuccess.status == "closed") {
+        rootNavigator.pop(true);
 
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text("Sesi berhasil ditutup"),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text("Sesi berhasil ditutup"),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     } else {
       scaffoldMessenger.showSnackBar(
         const SnackBar(content: Text("Gagal menutup sesi, coba lagi.")),
@@ -116,12 +118,14 @@ class _DetailSesiScreenState extends State<DetailSesiScreen>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          widget.sesi.courseName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.black,
+                        Expanded(
+                          child: Text(
+                            widget.sesi.courseName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                         if (widget.sesi.status == "opened")

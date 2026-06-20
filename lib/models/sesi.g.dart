@@ -19,7 +19,7 @@ Sesi _$SesiFromJson(Map<String, dynamic> json) => Sesi(
   startTime: json['start_time'] as String,
   endTime: json['end_time'] as String,
   status: json['status'] as String,
-  isAlreadyOpened: (json['is_already_opened'] as num).toInt(),
+  isAlreadyOpened: json['is_already_opened'],
   lecturerId: json['lecturer_id'] as String,
   lecturer: LecturerModel.fromJson(json['lecturer'] as Map<String, dynamic>),
   learningMaterials: (json['learning_materials'] as List<dynamic>?)
@@ -86,12 +86,7 @@ UpdateSesiRequest _$UpdateSesiRequestFromJson(Map<String, dynamic> json) =>
     UpdateSesiRequest(
       status: json['status'] as String,
       topic: json['topic'] as String?,
-      isAlreadyOpened: (json['is_already_opened'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$UpdateSesiRequestToJson(UpdateSesiRequest instance) =>
-    <String, dynamic>{
-      'topic': instance.topic,
-      'status': instance.status,
-      'is_already_opened': instance.isAlreadyOpened,
-    };
+    <String, dynamic>{'topic': instance.topic, 'status': instance.status};

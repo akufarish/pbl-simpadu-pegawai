@@ -34,7 +34,7 @@ class SesiService {
     }
   }
 
-  Future<bool> updateStatusSesi(
+  Future<Sesi?> updateStatusSesi(
     UpdateSesiRequest payload,
     String idSesi,
   ) async {
@@ -45,15 +45,19 @@ class SesiService {
 
     try {
       if (response.statusCode == 200) {
-        return true;
+        final result = ApiResponse<Sesi>.fromJson(
+          response.data,
+          ((json) => Sesi.fromJson(json as Map<String, dynamic>)),
+        );
+        return result.data!;
       }
-      return false;
+      return null;
     } on DioException catch (e) {
       debugPrint('Samting wong: $e');
-      return false;
+      return null;
     } catch (e) {
       debugPrint('Network error: $e');
-      return false;
+      return null;
     }
   }
 

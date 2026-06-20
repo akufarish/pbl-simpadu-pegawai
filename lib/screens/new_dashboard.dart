@@ -86,22 +86,28 @@ class _NewDashboardState extends State<NewDashboard> {
       sesiId: sesi.id,
     );
 
-    if (isSuccess == true) {
-      final result = await presensiProvider.createPresensiMahasiswa(
-        presensiRequest,
+    if (isSuccess != null) {
+      // final result = await presensiProvider.createPresensiMahasiswa(
+      //   presensiRequest,
+      // );
+
+      // if (result == null) {
+      dialogNavigator.pop();
+
+      if (mounted) {
+        _topicController.clear();
+      }
+
+      final refresh = await rootNavigator.push(
+        MaterialPageRoute(
+          builder: (context) => DetailSesiScreen(sesi: isSuccess),
+        ),
       );
 
-      if (result == null) {
-        dialogNavigator.pop();
-
-        if (mounted) {
-          _topicController.clear();
-        }
-
-        rootNavigator.push(
-          MaterialPageRoute(builder: (context) => DetailSesiScreen(sesi: sesi)),
-        );
+      if (refresh == true && mounted) {
+        _getDataSesi(_focusedDay);
       }
+      // }
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

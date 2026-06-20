@@ -37,7 +37,6 @@ class _SesiCardState extends State<SesiCard> {
     UpdateSesiRequest updateSesiRequest = UpdateSesiRequest(
       status: "opened",
       topic: topic,
-      isAlreadyOpened: 1,
     );
 
     final updateSesi = await sesiProvider.updateSesi(

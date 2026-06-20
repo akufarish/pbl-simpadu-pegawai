@@ -60,11 +60,11 @@ class SesiProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> updateSesi(UpdateSesiRequest payload, String id) async {
+  Future<Sesi?> updateSesi(UpdateSesiRequest payload, String id) async {
     isLoading = true;
     notifyListeners();
     try {
-      bool isSuccess = await sesiService.updateStatusSesi(payload, id);
+      Sesi? isSuccess = await sesiService.updateStatusSesi(payload, id);
       debugPrint("pls: $isSuccess");
       isLoading = false;
       notifyListeners();
@@ -73,7 +73,7 @@ class SesiProvider with ChangeNotifier {
       debugPrint(e.toString());
       isLoading = false;
       notifyListeners();
-      return false;
+      return null;
     }
   }
 

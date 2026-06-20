@@ -27,7 +27,7 @@ class Sesi {
   final String endTime;
   final String status;
   @JsonKey(name: 'is_already_opened')
-  final int isAlreadyOpened;
+  final dynamic isAlreadyOpened;
   @JsonKey(name: 'lecturer_id')
   final String lecturerId;
   final LecturerModel lecturer;
@@ -111,10 +111,8 @@ class UpdateSesiRequest {
   final String? topic;
   @JsonKey(name: 'status')
   final String status;
-  @JsonKey(name: "is_already_opened")
-  final int? isAlreadyOpened;
 
-  UpdateSesiRequest({required this.status, this.topic, this.isAlreadyOpened});
+  UpdateSesiRequest({required this.status, this.topic});
 
   factory UpdateSesiRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateSesiRequestFromJson(json);
